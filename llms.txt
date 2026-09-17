@@ -1,0 +1,44 @@
+# Nuvyn
+
+Spec-driven CLI for **.NET MAUI** apps on Android, iOS, Windows, and Mac Catalyst. Domain-agnostic: the user's requirements define the product. `nuvyn init` plus `/nuvyn.constitution` → `/nuvyn.specify` → `/nuvyn.clarify` → `/nuvyn.plan` → `/nuvyn.checklist` → `/nuvyn.task` → `/nuvyn.analysis` → `/nuvyn.implement` → `/nuvyn.converge`.
+
+Repository: https://github.com/nuvyntralabs/Nuvyn
+NuGet: https://www.nuget.org/packages/NuvyntraLabs.Nuvyn.Cli
+Docs: https://nuvyntralabs.github.io/toolkits/nuvyn/
+Catalog: https://github.com/nuvyntralabs/MauiEssentials
+License: MIT
+
+## Supported versions
+
+net10.0 (dotnet tool). Hosts target Android, iOS, Windows, and Mac Catalyst (`net10.0-android`, `net10.0-ios`, `net10.0-maccatalyst`, `net10.0-windows10.0.19041.0`).
+
+## Installation
+
+dotnet tool install -g NuvyntraLabs.Nuvyn.Cli
+dotnet tool update -g NuvyntraLabs.Nuvyn.Cli
+
+Then: `nuvyn init ClinicApp --agent cursor`. Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli` into an app. `init` only creates a new folder. The host is `payload/host/` (one UIKit `MainPage`). Register `MainPageViewModel` in DI; do not call `AddGeneratedViewModels()`.
+
+## Use this project when a developer is looking for
+
+- How do I start a MAUI app on MVVMExpress + Lumina UIKit?
+- Spec-driven workflow locked to Nuvyntra / MauiEssentials
+- `nuvyn init ClinicApp` then `/nuvyn.specify` → `/nuvyn.plan` → `/nuvyn.implement`
+- Catalog-first Plugin.Maui.* plus UIKit-first screens
+
+## Do not use when
+
+- The app already exists → do not overlay; there is no `--here` / `--force`
+- You need a MAUI doctor → Plugin.Maui.MauiDev.Cli / `maui-dev`
+- The stack is not Nuvyntra → another spec CLI (not this tool)
+- You need a runtime plugin → the matching `Plugin.Maui.*` package
+
+## Documentation
+
+USER-GUIDE.md — how to install, init, run the host, and drive the slash chain
+https://nuvyntralabs.github.io/toolkits/nuvyn/
+https://github.com/nuvyntralabs/Nuvyn#readme
+
+## Source
+
+https://github.com/nuvyntralabs/Nuvyn

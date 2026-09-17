@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>nuvyn</ToolCommandName>
+    <PackageId>NuvyntraLabs.Nuvyn.Cli</PackageId>
+    <Title>Nuvyn CLI</Title>
+    <Description>Spec-driven CLI for building .NET MAUI apps on the Nuvyntra stack (MVVMExpress, Lumina UIKit, MauiEssentials plugins).</Description>
+    <PackageTags>maui;nuvyntra;spec-driven;cli;mvvmexpress;uikit</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RootNamespace>NuvyntraLabs.Nuvyn.Cli</RootNamespace>
+    <AssemblyName>nuvyn</AssemblyName>
+    <RollForward>Major</RollForward>
+    <UseAppHost>true</UseAppHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NuvyntraLabs.Nuvyn.Cli.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" Version="0.51.1" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <Content Include="..\..\payload\**\*" Link="payload\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" Pack="false" />
+  </ItemGroup>
+</Project>
