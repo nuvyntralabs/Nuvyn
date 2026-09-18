@@ -55,19 +55,34 @@ if grep -F 'AddGeneratedViewModels()' "$APP/ProveHost/MauiProgram.cs" >/dev/null
   exit 1
 fi
 
-echo "==> restore Core + Tests"
-dotnet restore "$APP/ProveHost.Core/ProveHost.Core.csproj" --nologo
-dotnet restore "$APP/ProveHost.Tests/ProveHost.Tests.csproj" --nologo
+# Restoring the .sln (or the MAUI project with -p:TargetFrameworks=net10.0-android)
+# rewrites ProveHost.Core/obj/project.assets.json to android-only. Hide the sln
+# and wipe obj/bin so Core + Tests restore as net10.0 only.
+echo "==> isolate Core + Tests from the MAUI sln"
+SLN="$APP/ProveHost.sln"
+if [[ -f "$SLN" ]]; then
+  mv "$SLN" "$SLN.hidden"
+fi
+find "$APP" -type d \( -name obj -o -name bin \) -prune -exec rm -rf {} +
 
 echo "==> build Core + Tests (MVVMExpress)"
-dotnet test "$APP/ProveHost.Tests/ProveHost.Tests.csproj" --nologo --no-restore
+dotnet test "$APP/ProveHost.Tests/ProveHost.Tests.csproj" \
+  -f net10.0 \
+  -p:TargetFramework=net10.0 \
+  --nologo
+
+if [[ -f "$SLN.hidden" ]]; then
+  mv "$SLN.hidden" "$SLN"
+fi
 
 if [[ "${NUVYN_PROVE_MAUI:-}" == "1" ]]; then
   echo "==> build MAUI android host"
-  # Ubuntu CI installs maui-android only. Force the android TFM so implicit
-  # restore does not pull iOS / Mac Catalyst workload packs.
-  dotnet restore "$APP/ProveHost/ProveHost.csproj" -p:TargetFrameworks=net10.0-android --nologo
-  dotnet build "$APP/ProveHost/ProveHost.csproj" -f net10.0-android -p:TargetFrameworks=net10.0-android --nologo --no-restore
+  # Ubuntu CI installs maui-android only. Do this after Core/Tests so a leaked
+  # android TargetFrameworks property cannot rewrite their assets.
+  dotnet build "$APP/ProveHost/ProveHost.csproj" \
+    -f net10.0-android \
+    -p:TargetFrameworks=net10.0-android \
+    --nologo
 fi
 
 echo "==> nuvyn update leaves host and specs alone"

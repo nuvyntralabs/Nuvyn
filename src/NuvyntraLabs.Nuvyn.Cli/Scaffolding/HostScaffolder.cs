@@ -200,7 +200,12 @@ public static class HostScaffolder
         version = "";
         try
         {
-            var json = NugetHttp.GetStringAsync(FlatContainerIndex(packageId)).GetAwaiter().GetResult();
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+            var json = http.GetStringAsync(
+                    $"https://api.nuget.org/v3-flatcontainer/{packageId.ToLowerInvariant()}/index.json")
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult();
             return TryReadLatestStableVersion(json, out version);
         }
         catch
@@ -231,15 +236,6 @@ public static class HostScaffolder
         version = latest;
         return true;
     }
-
-    private static readonly HttpClient NugetHttp = new()
-    {
-        BaseAddress = new Uri("https://api.nuget.org/"),
-        Timeout = TimeSpan.FromSeconds(30),
-    };
-
-    private static string FlatContainerIndex(string packageId) =>
-        $"v3-flatcontainer/{packageId.ToLowerInvariant()}/index.json";
 
     private static string? PackageWarning(IReadOnlyList<string> failed) =>
         failed.Count == 0
