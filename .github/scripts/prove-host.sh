@@ -71,18 +71,22 @@ dotnet test "$APP/ProveHost.Tests/ProveHost.Tests.csproj" \
   -p:TargetFramework=net10.0 \
   --nologo
 
-if [[ -f "$SLN.hidden" ]]; then
-  mv "$SLN.hidden" "$SLN"
-fi
-
 if [[ "${NUVYN_PROVE_MAUI:-}" == "1" ]]; then
   echo "==> build MAUI android host"
-  # Ubuntu CI installs maui-android only. Do this after Core/Tests so a leaked
-  # android TargetFrameworks property cannot rewrite their assets.
+  # Do not pass -p:TargetFrameworks=net10.0-android. That global property
+  # rewrites Core's assets to android-only, then the Core compile (net10.0)
+  # fails with NETSDK1005. Linux already selects android via the host csproj.
+  # --no-dependencies uses the Core build from the test step above.
+  dotnet restore "$APP/ProveHost/ProveHost.csproj" --nologo
   dotnet build "$APP/ProveHost/ProveHost.csproj" \
     -f net10.0-android \
-    -p:TargetFrameworks=net10.0-android \
+    --no-restore \
+    --no-dependencies \
     --nologo
+fi
+
+if [[ -f "$SLN.hidden" ]]; then
+  mv "$SLN.hidden" "$SLN"
 fi
 
 echo "==> nuvyn update leaves host and specs alone"
