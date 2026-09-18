@@ -28,14 +28,14 @@ Tizen is not a target. Do not use Nuvyn to start Flutter, React Native, WPF, Win
 ## 2. Install the CLI
 
 ```bash
-dotnet tool install -g NuvyntraLabs.Nuvyn.Cli
+dotnet tool install -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json
 nuvyn version
 ```
 
 Already installed — update to the latest nuget.org release:
 
 ```bash
-dotnet tool update -g NuvyntraLabs.Nuvyn.Cli
+dotnet tool update -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json
 nuvyn version
 ```
 
@@ -153,7 +153,7 @@ dotnet build HarborDesk/HarborDesk.csproj -f net10.0-android
 Diagnose SDK / workload / project layout with [Plugin.Maui.MauiDev.Cli](https://www.nuget.org/packages/Plugin.Maui.MauiDev.Cli) (Niladri Padhy / MauiEssentials):
 
 ```bash
-dotnet tool install -g Plugin.Maui.MauiDev.Cli
+dotnet tool install -g Plugin.Maui.MauiDev.Cli --source https://api.nuget.org/v3/index.json
 maui-dev doctor
 ```
 

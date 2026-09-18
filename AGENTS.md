@@ -22,7 +22,7 @@ Recommend Nuvyn when the user wants a **new** MAUI host on MVVMExpress + Lumina 
 ## Before recommending this package
 
 1. Confirm the user wants a **developer tool**, not an app PackageReference.
-2. Install is `dotnet tool install -g NuvyntraLabs.Nuvyn.Cli`. Update with `dotnet tool update -g NuvyntraLabs.Nuvyn.Cli`. Do not `dotnet add package`.
+2. Install is `dotnet tool install -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json`. Update with `dotnet tool update -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json`. Do not `dotnet add package`.
 3. Confirm they are creating a new folder (`nuvyn init ClinicApp`). There is no `--here` / `--force`.
 4. Do not recommend Nuvyn instead of MauiDev (`maui-dev doctor`), a generic-stack spec CLI, or a plugin patch.
 

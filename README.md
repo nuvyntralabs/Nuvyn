@@ -5,7 +5,7 @@
 Spec-driven CLI for building **.NET MAUI** apps (Android, iOS, Windows, Mac Catalyst) on the **Nuvyntra** stack. It creates the host and locks plan/implement to MVVMExpress, Lumina UIKit, and the smallest `Plugin.Maui.*` set.
 
 ```bash
-dotnet tool install -g NuvyntraLabs.Nuvyn.Cli
+dotnet tool install -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json
 nuvyn init ClinicApp --agent cursor
 ```
 
@@ -27,14 +27,14 @@ Nuvyn is a **standalone product**. It must not `ProjectReference` MauiEssentials
 ## Install
 
 ```bash
-dotnet tool install -g NuvyntraLabs.Nuvyn.Cli
+dotnet tool install -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json
 nuvyn version
 ```
 
 Already installed — update to the latest nuget.org release:
 
 ```bash
-dotnet tool update -g NuvyntraLabs.Nuvyn.Cli
+dotnet tool update -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json
 nuvyn version
 ```
 
@@ -126,7 +126,7 @@ nuvyn --help
 ## Diagnose the app
 
 ```bash
-dotnet tool install -g Plugin.Maui.MauiDev.Cli
+dotnet tool install -g Plugin.Maui.MauiDev.Cli --source https://api.nuget.org/v3/index.json
 maui-dev doctor
 ```
 

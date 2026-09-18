@@ -9,7 +9,7 @@ dotnet restore
 dotnet build
 ```
 
-Optional: `dotnet tool install -g Plugin.Maui.MauiDev.Cli` then `maui-dev doctor`.
+Optional: `dotnet tool install -g Plugin.Maui.MauiDev.Cli --source https://api.nuget.org/v3/index.json` then `maui-dev doctor`.
 
 ## Android emulator
 
