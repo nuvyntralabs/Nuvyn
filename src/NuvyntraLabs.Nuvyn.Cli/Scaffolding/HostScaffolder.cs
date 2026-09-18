@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -24,6 +23,7 @@ public static class HostScaffolder
             HostTemplate.TryInstall(payloadRoot, projectDir, projectName))
         {
             var failed = AddDefaultPackages(projectDir);
+            ClearRestoreArtifacts(projectDir);
             MauiProgramPatcher.TryPatch(projectDir);
             return new(true, "uikit", PackageWarning(failed), failed);
         }
@@ -34,6 +34,7 @@ public static class HostScaffolder
         {
             OverlayUiKitPages(payloadRoot, projectDir, projectName);
             var failed = AddDefaultPackages(projectDir);
+            ClearRestoreArtifacts(projectDir);
             MauiProgramPatcher.TryPatch(projectDir);
             return new(true, "mvvmexpress",
                 FirstMessage(
@@ -45,6 +46,7 @@ public static class HostScaffolder
         if (TryDotnet(["new", "maui", "-n", projectName, "-o", projectDir, "--force"], projectDir))
         {
             var failed = AddDefaultPackages(projectDir);
+            ClearRestoreArtifacts(projectDir);
             MauiProgramPatcher.TryPatch(projectDir);
             return new(true, "maui",
                 FirstMessage(
@@ -125,23 +127,73 @@ public static class HostScaffolder
     }
 
     /// <summary>
-    /// Writes nuget.org's latest stable version into the csproj.
-    /// Version is resolved from the flat container (not <c>dotnet add</c> restore),
-    /// then added with <c>--no-restore</c> so Linux CI (android workload only) and
-    /// Apple-TFM hosts do not fail init when iOS / Mac Catalyst packs are missing.
+    /// Writes nuget.org's latest stable version into the csproj without
+    /// <c>dotnet add</c>. That command writes a partial <c>project.assets.json</c>
+    /// when restore is skipped, and a full restore pulls iOS / Mac Catalyst TFMs
+    /// on Linux CI (android workload only).
     /// </summary>
     internal static bool AddLatestPackage(string workingDirectory, string? project, string package)
     {
         if (!TryGetLatestStableVersion(package, out var version))
             return false;
 
-        return TryDotnet(AddPackageArguments(project, package, version), workingDirectory, TimeSpan.FromMinutes(10));
+        var csproj = project;
+        if (string.IsNullOrWhiteSpace(csproj))
+        {
+            csproj = Directory.Exists(workingDirectory)
+                ? Directory.EnumerateFiles(workingDirectory, "*.csproj", SearchOption.TopDirectoryOnly).FirstOrDefault()
+                : null;
+        }
+
+        return csproj is not null && TryWritePackageReference(csproj, package, version);
     }
 
-    internal static string[] AddPackageArguments(string? project, string package, string version) =>
-        project is null
-            ? ["add", "package", package, "--version", version, "--no-restore", "--source", NugetOrgSource]
-            : ["add", project, "package", package, "--version", version, "--no-restore", "--source", NugetOrgSource];
+    internal static bool TryWritePackageReference(string projectPath, string package, string version)
+    {
+        if (!File.Exists(projectPath) || string.IsNullOrWhiteSpace(package) || string.IsNullOrWhiteSpace(version))
+            return false;
+
+        var text = File.ReadAllText(projectPath);
+        var replacement = $@"<PackageReference Include=""{package}"" Version=""{version}"" />";
+        var existing = new Regex(
+            $@"<PackageReference\s+Include=""{Regex.Escape(package)}""(?:\s+Version=""[^""]*"")?\s*(?:/>|>\s*(?:<Version>[^<]*</Version>\s*)?</PackageReference>)",
+            RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        if (existing.IsMatch(text))
+        {
+            text = existing.Replace(text, replacement, 1);
+        }
+        else
+        {
+            var itemGroup = new Regex(@"(<ItemGroup>\s*)(<PackageReference\s)", RegexOptions.IgnoreCase);
+            if (itemGroup.IsMatch(text))
+            {
+                text = itemGroup.Replace(text, $"$1{replacement}\n    $2", 1);
+            }
+            else
+            {
+                var close = text.LastIndexOf("</Project>", StringComparison.OrdinalIgnoreCase);
+                if (close < 0)
+                    return false;
+                text = text.Insert(close, $"  <ItemGroup>\n    {replacement}\n  </ItemGroup>\n");
+            }
+        }
+
+        File.WriteAllText(projectPath, text);
+        return true;
+    }
+
+    internal static void ClearRestoreArtifacts(string projectDir)
+    {
+        if (!Directory.Exists(projectDir))
+            return;
+
+        foreach (var name in new[] { "obj", "bin" })
+        {
+            foreach (var dir in Directory.EnumerateDirectories(projectDir, name, SearchOption.AllDirectories).ToList())
+                try { Directory.Delete(dir, recursive: true); } catch { /* locked obj */ }
+        }
+    }
 
     internal static bool TryGetLatestStableVersion(string packageId, out string version)
     {
@@ -179,8 +231,6 @@ public static class HostScaffolder
         version = latest;
         return true;
     }
-
-    private const string NugetOrgSource = "https://api.nuget.org/v3/index.json";
 
     private static readonly HttpClient NugetHttp = new()
     {

@@ -55,14 +55,19 @@ if grep -F 'AddGeneratedViewModels()' "$APP/ProveHost/MauiProgram.cs" >/dev/null
   exit 1
 fi
 
+echo "==> restore Core + Tests"
+dotnet restore "$APP/ProveHost.Core/ProveHost.Core.csproj" --nologo
+dotnet restore "$APP/ProveHost.Tests/ProveHost.Tests.csproj" --nologo
+
 echo "==> build Core + Tests (MVVMExpress)"
-dotnet test "$APP/ProveHost.Tests/ProveHost.Tests.csproj" --nologo
+dotnet test "$APP/ProveHost.Tests/ProveHost.Tests.csproj" --nologo --no-restore
 
 if [[ "${NUVYN_PROVE_MAUI:-}" == "1" ]]; then
   echo "==> build MAUI android host"
   # Ubuntu CI installs maui-android only. Force the android TFM so implicit
   # restore does not pull iOS / Mac Catalyst workload packs.
-  dotnet build "$APP/ProveHost/ProveHost.csproj" -f net10.0-android -p:TargetFrameworks=net10.0-android --nologo
+  dotnet restore "$APP/ProveHost/ProveHost.csproj" -p:TargetFrameworks=net10.0-android --nologo
+  dotnet build "$APP/ProveHost/ProveHost.csproj" -f net10.0-android -p:TargetFrameworks=net10.0-android --nologo --no-restore
 fi
 
 echo "==> nuvyn update leaves host and specs alone"

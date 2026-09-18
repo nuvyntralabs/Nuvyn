@@ -103,16 +103,16 @@ public sealed class HostProofTests
     }
 
     [Fact]
-    public void Default_package_add_pins_latest_stable_without_restore()
+    public void Package_reference_is_written_into_the_csproj_without_dotnet_add()
     {
-        var args = HostScaffolder.AddPackageArguments("HarborDesk.csproj", DefaultHostPackages.MvvmExpress, "1.2.3");
-        Assert.Equal(
-            new[]
-            {
-                "add", "HarborDesk.csproj", "package", DefaultHostPackages.MvvmExpress,
-                "--version", "1.2.3", "--no-restore", "--source", "https://api.nuget.org/v3/index.json",
-            },
-            args);
+        var dest = Path.Combine(NewTemp(), "out");
+        Assert.True(HostTemplate.TryInstall(FindPayload(), dest, "HarborDesk"));
+        var csproj = Path.Combine(dest, "HarborDesk", "HarborDesk.csproj");
+
+        Assert.True(HostScaffolder.TryWritePackageReference(csproj, DefaultHostPackages.MvvmExpress, "1.2.3"));
+        var text = File.ReadAllText(csproj);
+        Assert.Contains("""<PackageReference Include="Plugin.Maui.MVVMExpress" Version="1.2.3" />""", text);
+        Assert.False(Directory.Exists(Path.Combine(dest, "HarborDesk", "obj")));
     }
 
     [Fact]
