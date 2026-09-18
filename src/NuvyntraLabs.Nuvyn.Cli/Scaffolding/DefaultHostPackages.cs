@@ -2,8 +2,9 @@ namespace NuvyntraLabs.Nuvyn.Cli.Scaffolding;
 
 /// <summary>
 /// Packages <c>nuvyn init</c> always adds. Do not add any other PackageReference
-/// until the user explicitly asks (plan / implement). Versions are never pinned —
-/// <c>dotnet add package</c> without <c>--version</c> takes the latest nuget.org release.
+/// until the user explicitly asks (plan / implement). Init writes nuget.org's
+/// latest stable version, then <c>dotnet add package --no-restore</c> so Linux
+/// hosts do not restore iOS / Mac Catalyst TFMs.
 /// </summary>
 public static class DefaultHostPackages
 {

@@ -60,7 +60,9 @@ dotnet test "$APP/ProveHost.Tests/ProveHost.Tests.csproj" --nologo
 
 if [[ "${NUVYN_PROVE_MAUI:-}" == "1" ]]; then
   echo "==> build MAUI android host"
-  dotnet build "$APP/ProveHost/ProveHost.csproj" -f net10.0-android --nologo
+  # Ubuntu CI installs maui-android only. Force the android TFM so implicit
+  # restore does not pull iOS / Mac Catalyst workload packs.
+  dotnet build "$APP/ProveHost/ProveHost.csproj" -f net10.0-android -p:TargetFrameworks=net10.0-android --nologo
 fi
 
 echo "==> nuvyn update leaves host and specs alone"

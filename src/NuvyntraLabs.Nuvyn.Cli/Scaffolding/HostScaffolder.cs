@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Net.Http;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace NuvyntraLabs.Nuvyn.Cli.Scaffolding;
@@ -122,13 +124,72 @@ public static class HostScaffolder
         return failed;
     }
 
-    /// <summary>No <c>--version</c> — nuget.org latest stable, written into the csproj.</summary>
+    /// <summary>
+    /// Writes nuget.org's latest stable version into the csproj.
+    /// Version is resolved from the flat container (not <c>dotnet add</c> restore),
+    /// then added with <c>--no-restore</c> so Linux CI (android workload only) and
+    /// Apple-TFM hosts do not fail init when iOS / Mac Catalyst packs are missing.
+    /// </summary>
     internal static bool AddLatestPackage(string workingDirectory, string? project, string package)
     {
-        return project is null
-            ? TryDotnet(["add", "package", package], workingDirectory, TimeSpan.FromMinutes(10))
-            : TryDotnet(["add", project, "package", package], workingDirectory, TimeSpan.FromMinutes(10));
+        if (!TryGetLatestStableVersion(package, out var version))
+            return false;
+
+        return TryDotnet(AddPackageArguments(project, package, version), workingDirectory, TimeSpan.FromMinutes(10));
     }
+
+    internal static string[] AddPackageArguments(string? project, string package, string version) =>
+        project is null
+            ? ["add", "package", package, "--version", version, "--no-restore", "--source", NugetOrgSource]
+            : ["add", project, "package", package, "--version", version, "--no-restore", "--source", NugetOrgSource];
+
+    internal static bool TryGetLatestStableVersion(string packageId, out string version)
+    {
+        version = "";
+        try
+        {
+            var json = NugetHttp.GetStringAsync(FlatContainerIndex(packageId)).GetAwaiter().GetResult();
+            return TryReadLatestStableVersion(json, out version);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    internal static bool TryReadLatestStableVersion(string flatContainerJson, out string version)
+    {
+        version = "";
+        using var doc = JsonDocument.Parse(flatContainerJson);
+        if (!doc.RootElement.TryGetProperty("versions", out var versions))
+            return false;
+
+        string? latest = null;
+        foreach (var item in versions.EnumerateArray())
+        {
+            var value = item.GetString();
+            if (string.IsNullOrEmpty(value) || value.Contains('-', StringComparison.Ordinal))
+                continue;
+            latest = value;
+        }
+
+        if (latest is null)
+            return false;
+
+        version = latest;
+        return true;
+    }
+
+    private const string NugetOrgSource = "https://api.nuget.org/v3/index.json";
+
+    private static readonly HttpClient NugetHttp = new()
+    {
+        BaseAddress = new Uri("https://api.nuget.org/"),
+        Timeout = TimeSpan.FromSeconds(30),
+    };
+
+    private static string FlatContainerIndex(string packageId) =>
+        $"v3-flatcontainer/{packageId.ToLowerInvariant()}/index.json";
 
     private static string? PackageWarning(IReadOnlyList<string> failed) =>
         failed.Count == 0
@@ -191,12 +252,30 @@ public static class HostScaffolder
             }
 
             Task.WaitAll(stdout, stderr);
-            return process.ExitCode == 0;
+            if (process.ExitCode == 0)
+                return true;
+
+            WriteDotnetFailure(args, stdout.Result, stderr.Result);
+            return false;
         }
         catch
         {
             return false;
         }
+    }
+
+    private static void WriteDotnetFailure(IEnumerable<string> args, string stdout, string stderr)
+    {
+        var text = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+        text = text.Trim();
+        if (text.Length == 0)
+            return;
+
+        var lines = text.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var snippet = string.Join(" | ", lines.TakeLast(4));
+        if (snippet.Length > 400)
+            snippet = snippet[^400..];
+        Console.Error.WriteLine($"dotnet {string.Join(' ', args)}: {snippet}");
     }
 
     private static void WriteFallbackReadme(string projectDir, string projectName)

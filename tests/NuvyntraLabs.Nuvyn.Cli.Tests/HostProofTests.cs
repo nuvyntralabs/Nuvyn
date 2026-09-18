@@ -90,6 +90,41 @@ public sealed class HostProofTests
     }
 
     [Fact]
+    public void Embedded_maui_host_keeps_apple_tfms_off_linux()
+    {
+        var dest = Path.Combine(NewTemp(), "out");
+        Assert.True(HostTemplate.TryInstall(FindPayload(), dest, "HarborDesk"));
+
+        var csproj = File.ReadAllText(Path.Combine(dest, "HarborDesk", "HarborDesk.csproj"));
+        Assert.Contains("net10.0-android", csproj, StringComparison.Ordinal);
+        Assert.Contains("net10.0-ios", csproj, StringComparison.Ordinal);
+        Assert.Contains("net10.0-maccatalyst", csproj, StringComparison.Ordinal);
+        Assert.Contains("IsOSPlatform('linux')", csproj, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Default_package_add_pins_latest_stable_without_restore()
+    {
+        var args = HostScaffolder.AddPackageArguments("HarborDesk.csproj", DefaultHostPackages.MvvmExpress, "1.2.3");
+        Assert.Equal(
+            new[]
+            {
+                "add", "HarborDesk.csproj", "package", DefaultHostPackages.MvvmExpress,
+                "--version", "1.2.3", "--no-restore", "--source", "https://api.nuget.org/v3/index.json",
+            },
+            args);
+    }
+
+    [Fact]
+    public void Latest_stable_version_ignores_prerelease_and_takes_the_last_stable()
+    {
+        Assert.True(HostScaffolder.TryReadLatestStableVersion(
+            """{"versions":["1.0.0","1.0.1-rc","1.0.1","1.1.0-preview.1"]}""",
+            out var version));
+        Assert.Equal("1.0.1", version);
+    }
+
+    [Fact]
     public void Unexpected_host_package_is_any_catalog_id_outside_the_maui_default_set()
     {
         Assert.True(DefaultHostPackages.IsUnexpectedHostPackage(DefaultHostPackages.LocalStore));
