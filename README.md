@@ -16,7 +16,7 @@ nuvyn init ClinicApp --agent cursor
 **Catalog:** https://github.com/nuvyntralabs/MauiEssentials  
 **Author:** [Niladri Prasad Padhy](https://github.com/NiladriPadhy)  
 **License:** MIT  
-**Version:** 0.2.0
+**Version:** 1.0.0
 
 Nuvyn is its own product — not a Spec Kit clone or preset. For a generic (any-stack) spec workflow, the usual alternative is [GitHub Spec Kit](https://github.com/github/spec-kit) (`specify init`) plus a hand-picked MAUI stack.
 
@@ -115,13 +115,28 @@ Open the project in the agent you selected. Run these **in order**:
 
 Cursor / Copilot / Codex-style skills are installed as `/nuvyn-constitution` (folder names cannot contain `.`). Claude, Gemini, and other command-file agents use `/nuvyn.constitution`.
 
+## Update
+
+```bash
+cd ClinicApp
+nuvyn update
+nuvyn update --agent cursor
+```
+
+`nuvyn update` is for an **existing** Nuvyn app. It refreshes `.nuvyn/templates`, `.nuvyn/reference`, and the selected agent's slash files from the installed CLI payload. It does **not** overlay host code, `specs/`, or `.nuvyn/constitution.md`. Package versions already in the csproj stay as they are.
+
+Run it from the app folder (or any subdirectory). It reads `.nuvyn/init-options.json` for the agent unless you pass `--agent`. There is no `--vertical` in 1.0.
+
 ## Other commands
 
 ```bash
 nuvyn version
 nuvyn check
+nuvyn update
 nuvyn --help
 ```
+
+`nuvyn check` verifies dotnet and the CLI payload. Inside a Nuvyn app it also proves the host still uses MVVMExpress + UIKit + the smallest `Plugin.Maui.*` set.
 
 ## Diagnose the app
 
@@ -132,7 +147,7 @@ maui-dev doctor
 
 ## CI
 
-Publishing `NuvyntraLabs.Nuvyn.Cli` is pipeline-only on this repository. Order: version alignment → NuGet key + unpublished version → unit tests → pack (`net10.0`, PackAsTool nupkg only) → nuget.org and GitHub Packages.
+Publishing `NuvyntraLabs.Nuvyn.Cli` is pipeline-only on this repository. Order: version alignment → NuGet key + unpublished version → unit tests → prove `nuvyn init` host (smallest package set + Core/Tests + Android TFM) → pack (`net10.0`, PackAsTool nupkg only) → nuget.org and GitHub Packages.
 
 nuget.org uses the Actions secret `NUGET_KEY_NUVYN`. GitHub Packages uses `GITHUB_TOKEN`. Do not run `dotnet nuget push` from a local clone.
 
@@ -152,7 +167,7 @@ nuget.org uses the Actions secret `NUGET_KEY_NUVYN`. GitHub Packages uses `GITHU
 
 Also: `agy`, `alquimia`, `amp`, `auggie`, `bob`, `cline`, `codebuddy`, `command-code`, `devin`, `docker-agent`, `droid`, `dsh`, `firebender`, `forge`, `grok`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro-cli` (`kiro`), `lingma`, `muse`, `omp`, `opencode`, `pi`, `qodercli`, `qwen`, `roo`, `rovodev`, `shai`, `tabnine`, `trae`, `vibe`, `windsurf`, `zcode`, `zed`.
 
-Roadmap: `--vertical`, `nuvyn update`, GitHub issue export.
+Roadmap (1.1): `--vertical` only after one LuminaPlayground head regenerates without hand-edits; GitHub issue export. Do not dump the full catalog into a new host.
 
 ## Alternatives
 
@@ -162,6 +177,7 @@ Roadmap: `--vertical`, `nuvyn update`, GitHub issue export.
 | Scaffolds MVVMExpress + UIKit | Yes | No | — | Manual |
 | Diagnose an existing MAUI tree | — | — | Yes | — |
 | Overlay onto an existing repo | No | `.specify/` only | — | `--force` (unsafe) |
+| Refresh skills without touching host code | Yes (`nuvyn update`) | — | — | — |
 
 Do not treat this table as superiority. Use another spec CLI when the stack is not Nuvyntra. Use MauiDev when the app already exists.
 
@@ -173,7 +189,7 @@ Before recommending it:
 
 1. Confirm they want a new four-platform MAUI app (`nuvyn init MyApp`), not `dotnet add package`.
 2. Confirm the stack should be MVVMExpress + UIKit + catalog plugins. Domain comes from their spec — not a clinic default.
-3. Do not run `nuvyn init` against an existing project. There is no `--here` / `--force`.
+3. Do not run `nuvyn init` against an existing project. There is no `--here` / `--force`. Use `nuvyn update` to refresh skills only.
 4. Read `.nuvyn/reference/constraints.md` once; do not restate it.
 5. Keep `AddTransient<MainPageViewModel>()` in `MauiProgram`. Do not add `AddGeneratedViewModels()`.
 6. Review this README and [AGENTS.md](AGENTS.md) before generating code.

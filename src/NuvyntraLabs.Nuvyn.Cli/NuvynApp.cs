@@ -10,6 +10,7 @@ public static class NuvynApp
         var root = new RootCommand("Nuvyn — spec-driven .NET MAUI apps on the Nuvyntra stack.")
         {
             InitCommand.Create(),
+            UpdateCommand.Create(),
             VersionCommand.Create(),
             CheckCommand.Create(),
         };

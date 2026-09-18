@@ -4,7 +4,7 @@ How to create and grow a **.NET MAUI** app on the **Nuvyntra** developer ecosyst
 
 These packages are [Niladri Prasad Padhy](https://github.com/NiladriPadhy) / Nuvyntra Labs work. Nuvyn is its own product, not a Spec Kit clone. Usual alternatives: [GitHub Spec Kit](https://github.com/github/spec-kit) (any stack), stock `dotnet new maui`, CommunityToolkit, Refit, Polly.
 
-**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 0.2.0 · **License:** MIT  
+**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 1.0.0 · **License:** MIT  
 **Site:** https://nuvyntralabs.github.io/toolkits/nuvyn/  
 **Catalog:** https://nuvyntralabs.github.io/llms.txt
 
@@ -41,7 +41,7 @@ nuvyn version
 
 That is a **global tool**, not an app PackageReference. Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli`. The update refreshes the CLI only; existing apps keep the packages they already have.
 
-Other CLI commands: `nuvyn check`, `nuvyn --help`.
+Other CLI commands: `nuvyn update`, `nuvyn check`, `nuvyn --help`.
 
 ---
 
@@ -159,7 +159,23 @@ maui-dev doctor
 
 ---
 
-## 6. Build the product with the agent
+## 6. Refresh skills on an existing app
+
+Do **not** re-run `nuvyn init` on a tree that already exists. After you update the global CLI (`dotnet tool update -g NuvyntraLabs.Nuvyn.Cli`), refresh the app's slash files:
+
+```bash
+cd HarborDesk
+nuvyn update
+nuvyn update --agent cursor
+```
+
+`update` overwrites `.nuvyn/templates/`, `.nuvyn/reference/`, and the agent command files. It leaves host code, `specs/`, and `.nuvyn/constitution.md` alone. It does not change PackageReference versions. `--vertical` is not in 1.0.
+
+`nuvyn check` inside the app also proves the host still uses MVVMExpress + UIKit + HttpForge + FormValidation + KeyboardManager — and nothing else from the catalog.
+
+---
+
+## 7. Build the product with the agent
 
 Open the **project folder** in the agent you selected. Run the slash commands **in order**. Pass extra text after the command when you have a prompt (`$ARGUMENTS`). Empty `/nuvyn.specify` asks you to describe the product.
 
@@ -194,7 +210,7 @@ Domain comes from **your** spec. Nuvyn is not a clinic (or any other vertical) t
 
 ---
 
-## 7. How the ecosystem is used
+## 8. How the ecosystem is used
 
 Standing law after init: `.nuvyn/reference/constraints.md`. Read it once. Do not paste it into the spec.
 
@@ -243,11 +259,12 @@ Never `dotnet nuget push` from a local clone. Publishing is pipeline-only (`NUGE
 
 ---
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 | Symptom | What to do |
 | --- | --- |
-| `ClinicApp already exists` | `init` is new projects only. The existing folder was not changed. Pick another name, or delete a leftover failed scaffold, then retry |
+| `ClinicApp already exists` | `init` is new projects only. The existing folder was not changed. Pick another name, or delete a leftover failed scaffold, then retry. To refresh skills, `cd` into the app and run `nuvyn update` |
+| `Not a Nuvyn project` | `update` / `check` host proof need a `.nuvyn/` folder from `nuvyn init` |
 | Launch: unable to resolve `MainPageViewModel` | Add `builder.Services.AddTransient<MainPageViewModel>()` |
 | Build: `AddGeneratedViewModels` / `Plugin.Maui.MVVMExpress.Generated` | Remove that call and using. Register the view-model with `AddTransient` |
 | Two `.UseMvvmExpress()` calls | Keep only the configured `UseMvvmExpress(o => …)` chain |
@@ -256,16 +273,16 @@ Never `dotnet nuget push` from a local clone. Publishing is pipeline-only (`NUGE
 
 ---
 
-## 9. Related tools
+## 10. Related tools
 
 | Need | Tool | Notes |
 | --- | --- | --- |
-| New Nuvyntra MAUI host + spec chain | **Nuvyn** (`nuvyn init`) | This guide |
+| New Nuvyntra MAUI host + spec chain | **Nuvyn** (`nuvyn init`, then `nuvyn update`) | This guide |
 | Diagnose an existing MAUI tree | **MauiDev** (`maui-dev doctor`) | [NuGet](https://www.nuget.org/packages/Plugin.Maui.MauiDev.Cli) |
 | Any stack, spec only | GitHub Spec Kit (`specify`) | No MVVMExpress / UIKit host |
 | One plugin | The matching `Plugin.Maui.*` | [Catalog](https://github.com/nuvyntralabs/MauiEssentials) |
 
-Roadmap: `nuvyn update`, `--vertical`. Coding agents match Spec Kit.
+Roadmap (1.1): `--vertical` only after one LuminaPlayground head (Market / Clinic / Field / Bank / Civic) regenerates without hand-edits; GitHub issue export. Coding agents match Spec Kit.
 
 ---
 

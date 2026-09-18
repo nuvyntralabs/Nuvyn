@@ -3,7 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace NuvyntraLabs.Nuvyn.Cli.Scaffolding;
 
-public sealed record HostScaffoldResult(bool Created, string Method, string? Warning);
+public sealed record HostScaffoldResult(
+    bool Created,
+    string Method,
+    string? Warning,
+    IReadOnlyList<string>? FailedPackages = null);
 
 public static class HostScaffolder
 {
@@ -17,9 +21,9 @@ public static class HostScaffolder
         if (!string.IsNullOrWhiteSpace(payloadRoot) &&
             HostTemplate.TryInstall(payloadRoot, projectDir, projectName))
         {
-            AddDefaultPackages(projectDir);
+            var failed = AddDefaultPackages(projectDir);
             MauiProgramPatcher.TryPatch(projectDir);
-            return new(true, "uikit", null);
+            return new(true, "uikit", PackageWarning(failed), failed);
         }
 
         TryDotnet(["new", "install", "Plugin.Maui.MVVMExpress.Templates"], projectDir);
@@ -27,18 +31,24 @@ public static class HostScaffolder
         if (TryDotnet(["new", "mvvmexpress", "-n", projectName, "-o", projectDir, "--force"], projectDir))
         {
             OverlayUiKitPages(payloadRoot, projectDir, projectName);
-            AddDefaultPackages(projectDir);
+            var failed = AddDefaultPackages(projectDir);
             MauiProgramPatcher.TryPatch(projectDir);
             return new(true, "mvvmexpress",
-                "Embedded Nuvyn host was missing. Used dotnet new mvvmexpress and overlaid UIKit pages.");
+                FirstMessage(
+                    "Embedded Nuvyn host was missing. Used dotnet new mvvmexpress and overlaid UIKit pages.",
+                    PackageWarning(failed)),
+                failed);
         }
 
         if (TryDotnet(["new", "maui", "-n", projectName, "-o", projectDir, "--force"], projectDir))
         {
-            AddDefaultPackages(projectDir);
+            var failed = AddDefaultPackages(projectDir);
             MauiProgramPatcher.TryPatch(projectDir);
             return new(true, "maui",
-                "Embedded Nuvyn host was missing. Used dotnet new maui and wired MVVMExpress + UIKit + HttpForge + FormValidation + KeyboardManager.");
+                FirstMessage(
+                    "Embedded Nuvyn host was missing. Used dotnet new maui and wired MVVMExpress + UIKit + HttpForge + FormValidation + KeyboardManager.",
+                    PackageWarning(failed)),
+                failed);
         }
 
         WriteFallbackReadme(projectDir, projectName);
@@ -77,8 +87,9 @@ public static class HostScaffolder
         }
     }
 
-    internal static void AddDefaultPackages(string projectDir)
+    internal static IReadOnlyList<string> AddDefaultPackages(string projectDir)
     {
+        var failed = new List<string>();
         var projects = Directory.Exists(projectDir)
             ? Directory.EnumerateFiles(projectDir, "*.csproj", SearchOption.AllDirectories).ToList()
             : [];
@@ -86,28 +97,46 @@ public static class HostScaffolder
         if (projects.Count == 0)
         {
             foreach (var package in DefaultHostPackages.AfterHost)
-                AddLatestPackage(projectDir, project: null, package);
-            return;
+            {
+                if (!AddLatestPackage(projectDir, project: null, package))
+                    failed.Add(package);
+            }
+
+            return failed;
         }
 
         foreach (var project in projects)
         {
-            foreach (var package in DefaultHostPackages.ForProject(project))
-                AddLatestPackage(projectDir, project, package);
+            var planned = DefaultHostPackages.ForProject(project);
+            var existing = ExistingNuvyntraPackages(project)
+                .Where(id => !planned.Contains(id, StringComparer.OrdinalIgnoreCase))
+                .ToList();
 
-            foreach (var package in ExistingNuvyntraPackages(project))
-                AddLatestPackage(projectDir, project, package);
+            foreach (var package in planned.Concat(existing))
+            {
+                if (!AddLatestPackage(projectDir, project, package))
+                    failed.Add($"{package} ({Path.GetFileName(project)})");
+            }
         }
+
+        return failed;
     }
 
-    /// <summary>No <c>--version</c> — nuget.org latest stable.</summary>
-    internal static void AddLatestPackage(string workingDirectory, string? project, string package)
+    /// <summary>No <c>--version</c> — nuget.org latest stable, written into the csproj.</summary>
+    internal static bool AddLatestPackage(string workingDirectory, string? project, string package)
     {
-        if (project is null)
-            TryDotnet(["add", "package", package], workingDirectory);
-        else
-            TryDotnet(["add", project, "package", package], workingDirectory);
+        return project is null
+            ? TryDotnet(["add", "package", package], workingDirectory, TimeSpan.FromMinutes(10))
+            : TryDotnet(["add", project, "package", package], workingDirectory, TimeSpan.FromMinutes(10));
     }
+
+    private static string? PackageWarning(IReadOnlyList<string> failed) =>
+        failed.Count == 0
+            ? null
+            : "Could not add from nuget.org: " + string.Join(", ", failed);
+
+    private static string? FirstMessage(string primary, string? extra) =>
+        extra is null ? primary : primary + " " + extra;
 
     internal static IEnumerable<string> ExistingNuvyntraPackages(string projectPath)
     {
@@ -130,7 +159,10 @@ public static class HostScaffolder
             });
     }
 
-    internal static bool TryDotnet(IEnumerable<string> args, string workingDirectory)
+    internal static bool TryDotnet(IEnumerable<string> args, string workingDirectory) =>
+        TryDotnet(args, workingDirectory, TimeSpan.FromMinutes(3));
+
+    internal static bool TryDotnet(IEnumerable<string> args, string workingDirectory, TimeSpan timeout)
     {
         try
         {
@@ -150,12 +182,15 @@ public static class HostScaffolder
             if (process is null)
                 return false;
 
-            if (!process.WaitForExit(180_000))
+            var stdout = process.StandardOutput.ReadToEndAsync();
+            var stderr = process.StandardError.ReadToEndAsync();
+            if (!process.WaitForExit((int)timeout.TotalMilliseconds))
             {
                 try { process.Kill(entireProcessTree: true); } catch { /* ignore */ }
                 return false;
             }
 
+            Task.WaitAll(stdout, stderr);
             return process.ExitCode == 0;
         }
         catch

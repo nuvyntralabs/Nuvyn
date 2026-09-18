@@ -100,6 +100,9 @@ internal static class InitCommand
             ConsoleUi.Ok($"Host: {host.Method}");
         if (host.Warning is not null)
             ConsoleUi.Warn(host.Warning);
+        var packagesFailed = host.FailedPackages is { Count: > 0 };
+        if (packagesFailed)
+            ConsoleUi.Error("nuvyn init needs nuget.org to add the default host packages. The folder was created but is not yet buildable.");
 
         ConsoleUi.Step(4, "Installing .nuvyn templates…");
         PayloadInstaller.InstallNuvynTree(payload, projectDir, projectName);
@@ -112,12 +115,33 @@ internal static class InitCommand
 
         ProjectReadme.Write(projectDir, projectName, agent);
 
+        if (host.Created)
+        {
+            var proof = HostProof.Inspect(projectDir);
+            foreach (var item in proof.Ok.Take(6))
+                ConsoleUi.Ok(item);
+            foreach (var warning in proof.Warnings)
+                ConsoleUi.Warn(warning);
+            foreach (var error in proof.Errors)
+                ConsoleUi.Error(error);
+            if (!proof.Passed)
+            {
+                ConsoleUi.Error("Host proof failed. The scaffold does not use the locked Nuvyntra set.");
+                return 1;
+            }
+        }
+
+        if (packagesFailed)
+            return 1;
+
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold]Next[/]");
         AnsiConsole.MarkupLine($"  cd {ConsoleUi.Escape(projectName)}");
+        AnsiConsole.MarkupLine("  dotnet build");
         AnsiConsole.MarkupLine($"  Open this folder in {ConsoleUi.Escape(agent.DisplayName)} and run:");
         foreach (var slash in NuvynCommands.Slash)
             AnsiConsole.MarkupLine($"    [cyan]{slash}[/]");
+        AnsiConsole.MarkupLine("  Later: [cyan]nuvyn update[/] refreshes skills without overlaying host code.");
 
         return 0;
     }

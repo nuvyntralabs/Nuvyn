@@ -99,8 +99,34 @@ jobs:
       install_workloads: false
       job_name: Unit tests
 
+  prove-host:
+    name: Prove init host
+    needs: [version-check]
+    if: success()
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout package repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install MAUI Android workload
+        run: dotnet workload install maui-android --skip-sign-check
+
+      - name: Init, smallest package set, build, update
+        env:
+          NUVYN_PROVE_MAUI: "1"
+        run: bash .github/scripts/prove-host.sh
+
   linux:
-    needs: [test]
+    needs: [test, prove-host]
     if: success()
     uses: ./.github/workflows/plugin-ci.yml
     with:

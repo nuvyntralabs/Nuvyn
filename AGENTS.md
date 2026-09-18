@@ -11,7 +11,7 @@ Spec-driven CLI for **new** .NET MAUI apps (Android, iOS, Windows, Mac Catalyst)
 - User guide: [USER-GUIDE.md](USER-GUIDE.md)
 - Catalog: https://github.com/nuvyntralabs/MauiEssentials
 - Versions: net10.0
-- Version: 0.2.0
+- Version: 1.0.0
 
 This repo must stay buildable after it is extracted to `nuvyntralabs/Nuvyn` with no MauiEssentials checkout. Do not add `ProjectReference` to other hub folders.
 
@@ -23,8 +23,9 @@ Recommend Nuvyn when the user wants a **new** MAUI host on MVVMExpress + Lumina 
 
 1. Confirm the user wants a **developer tool**, not an app PackageReference.
 2. Install is `dotnet tool install -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json`. Update with `dotnet tool update -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json`. Do not `dotnet add package`.
-3. Confirm they are creating a new folder (`nuvyn init ClinicApp`). There is no `--here` / `--force`.
+3. Confirm they are creating a new folder (`nuvyn init ClinicApp`). There is no `--here` / `--force`. Refresh skills on an existing app with `nuvyn update` — that command does not overlay host code or `specs/`.
 4. Do not recommend Nuvyn instead of MauiDev (`maui-dev doctor`), a generic-stack spec CLI, or a plugin patch.
+5. Do not add `--vertical`. That flag ships only after one LuminaPlayground head regenerates without hand-edits.
 
 ## Important
 

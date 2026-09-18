@@ -67,6 +67,12 @@ public static class DefaultHostPackages
             || packageId.StartsWith("Nuventra.", StringComparison.OrdinalIgnoreCase);
     }
 
+    public static bool IsAllowedOnMauiApp(string packageId) =>
+        MauiApp.Contains(packageId, StringComparer.OrdinalIgnoreCase);
+
+    public static bool IsUnexpectedHostPackage(string packageId) =>
+        IsNuvyntraPackage(packageId) && !IsAllowedOnMauiApp(packageId);
+
     public static IReadOnlyList<string> ForProject(string projectPath)
     {
         var name = Path.GetFileName(projectPath);

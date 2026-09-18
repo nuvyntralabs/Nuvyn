@@ -1,5 +1,6 @@
 using System.Text;
 using NuvyntraLabs.Nuvyn.Cli.Agents;
+using NuvyntraLabs.Nuvyn.Cli.Infrastructure;
 using NuvyntraLabs.Nuvyn.Cli.Workflow;
 
 namespace NuvyntraLabs.Nuvyn.Cli.Scaffolding;
@@ -26,6 +27,17 @@ public static class AgentInstaller
 
         WriteInitOptions(projectDir, agent);
         return written;
+    }
+
+    public static AiAgent? DetectInstalled(string projectDir)
+    {
+        foreach (var agent in AiAgent.All)
+        {
+            if (File.Exists(Destination(projectDir, agent, "specify")))
+                return agent;
+        }
+
+        return null;
     }
 
     internal static string Destination(string projectDir, AiAgent agent, string id)
@@ -117,14 +129,12 @@ public static class AgentInstaller
 
     private static void WriteInitOptions(string projectDir, AiAgent agent)
     {
-        var nuvyn = Path.Combine(projectDir, ".nuvyn");
-        Directory.CreateDirectory(nuvyn);
-        File.WriteAllText(Path.Combine(nuvyn, "init-options.json"),
-            $$"""
-            {
-              "agent": "{{agent.Id}}",
-              "cli": "NuvyntraLabs.Nuvyn.Cli"
-            }
-            """);
+        var existing = InitOptions.TryRead(projectDir);
+        var options = existing ?? InitOptions.Create(agent.Id);
+        options.Agent = agent.Id;
+        options.Cli = InitOptions.CliId;
+        options.CliVersion = Commands.VersionCommand.GetVersion();
+        options.Updated ??= DateTime.UtcNow.ToString("yyyy-MM-dd");
+        InitOptions.Write(projectDir, options);
     }
 }
