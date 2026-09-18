@@ -17,7 +17,7 @@ net10.0 (dotnet tool). Hosts target Android, iOS, Windows, and Mac Catalyst (`ne
 dotnet tool install -g NuvyntraLabs.Nuvyn.Cli
 dotnet tool update -g NuvyntraLabs.Nuvyn.Cli
 
-Then: `nuvyn init ClinicApp --agent cursor`. Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli` into an app. `init` only creates a new folder. The host is `payload/host/` (one UIKit `MainPage`). Register `MainPageViewModel` in DI; do not call `AddGeneratedViewModels()`.
+Then: `nuvyn init ClinicApp --agent cursor` (or `copilot`, `claude`, `gemini`, `codex`, `windsurf`, …). Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli` into an app. `init` only creates a new folder. The host is `payload/host/` (one UIKit `MainPage`). Register `MainPageViewModel` in DI; do not call `AddGeneratedViewModels()`.
 
 ## Use this project when a developer is looking for
 

@@ -46,6 +46,12 @@ public sealed class InitTests
     [InlineData("copilot", ".github/skills/nuvyn-specify/SKILL.md")]
     [InlineData("claude", ".claude/commands/nuvyn.specify.md")]
     [InlineData("gemini", ".gemini/commands/nuvyn.specify.toml")]
+    [InlineData("codex", ".agents/skills/nuvyn-specify/SKILL.md")]
+    [InlineData("opencode", ".opencode/commands/nuvyn.specify.md")]
+    [InlineData("goose", ".goose/recipes/nuvyn.specify.yaml")]
+    [InlineData("windsurf", ".windsurf/workflows/nuvyn.specify.md")]
+    [InlineData("kiro-cli", ".kiro/prompts/nuvyn.specify.md")]
+    [InlineData("agy", ".agents/skills/nuvyn-specify/SKILL.md")]
     public void Agent_installer_writes_expected_path(string agentId, string relative)
     {
         var root = NewTemp();
@@ -54,6 +60,62 @@ public sealed class InitTests
             var agent = AiAgent.Find(agentId)!;
             AgentInstaller.Install(FindPayload(), root, agent);
             Assert.True(File.Exists(Path.Combine(root, relative)), relative);
+        }
+        finally
+        {
+            TryDelete(root);
+        }
+    }
+
+    [Fact]
+    public void Agent_catalog_covers_speckit_keys_and_aliases()
+    {
+        Assert.Equal(44, AiAgent.All.Count);
+        Assert.Equal(AiAgent.All.Count, AiAgent.All.Select(a => a.Id).Distinct(StringComparer.Ordinal).Count());
+        Assert.Same(AiAgent.Cursor, AiAgent.Find("cursor-agent"));
+        Assert.Same(AiAgent.KiroCli, AiAgent.Find("kiro"));
+        Assert.Same(AiAgent.Cursor, AiAgent.Find("cursor (Cursor)"));
+        Assert.Contains("agy", AiAgent.Ids);
+        Assert.Contains("windsurf", AiAgent.Ids);
+        Assert.Contains("generic", AiAgent.Ids);
+    }
+
+    [Fact]
+    public void Agent_installer_writes_every_catalog_entry()
+    {
+        var payload = FindPayload();
+        foreach (var agent in AiAgent.All)
+        {
+            var root = NewTemp();
+            try
+            {
+                AgentInstaller.Install(payload, root, agent);
+                var dest = AgentInstaller.Destination(root, agent, "specify");
+                Assert.True(File.Exists(dest), dest);
+            }
+            finally
+            {
+                TryDelete(root);
+            }
+        }
+    }
+
+    [Fact]
+    public void Forge_omits_handoffs_and_goose_writes_recipe_yaml()
+    {
+        var payload = FindPayload();
+        var root = NewTemp();
+        try
+        {
+            AgentInstaller.Install(payload, root, AiAgent.Forge);
+            var forge = File.ReadAllText(Path.Combine(root, ".forge", "commands", "nuvyn.specify.md"));
+            Assert.Contains("name: nuvyn-specify", forge);
+            Assert.DoesNotContain("handoffs:", forge);
+
+            AgentInstaller.Install(payload, root, AiAgent.Goose);
+            var goose = File.ReadAllText(Path.Combine(root, ".goose", "recipes", "nuvyn.specify.yaml"));
+            Assert.Contains("title: nuvyn.specify", goose);
+            Assert.Contains("prompt: |2", goose);
         }
         finally
         {

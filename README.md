@@ -16,7 +16,7 @@ nuvyn init ClinicApp --agent cursor
 **Catalog:** https://github.com/nuvyntralabs/MauiEssentials  
 **Author:** [Niladri Prasad Padhy](https://github.com/NiladriPadhy)  
 **License:** MIT  
-**Version:** 0.1.0
+**Version:** 0.2.0
 
 Nuvyn is its own product — not a Spec Kit clone or preset. For a generic (any-stack) spec workflow, the usual alternative is [GitHub Spec Kit](https://github.com/github/spec-kit) (`specify init`) plus a hand-picked MAUI stack.
 
@@ -52,12 +52,7 @@ nuvyn init ClinicApp --agent copilot
 
 If `ClinicApp/` already exists (directory or file), `init` prints an error and exits with code `1`. The existing tree is left untouched. Pick another name, or delete a leftover failed scaffold yourself, then run `init` again. For an app that already exists, use `maui-dev doctor` — do not re-run `nuvyn init` on that tree.
 
-The CLI asks you to **select an AI agent** when `--agent` is omitted:
-
-- Cursor
-- GitHub Copilot
-- Claude Code
-- Gemini CLI
+The CLI asks you to **select an AI coding agent** when `--agent` is omitted. The picker matches Spec Kit's set (searchable): Cursor, GitHub Copilot, Claude Code, Gemini CLI, Codex, Windsurf, and 30+ more. Pass a key (`cursor`, `copilot`, `claude`, `gemini`, `codex`, `cursor-agent`, `windsurf`, `generic`, …) to skip the prompt.
 
 `init` copies the embedded host from `payload/host/` (not stock `dotnet new maui` pages), then `dotnet add`s the default Nuvyntra packages from nuget.org **without a pinned version** (latest stable). If that copy is missing it falls back to `dotnet new mvvmexpress` and overlays the same `MainPage`.
 
@@ -118,7 +113,7 @@ Open the project in the agent you selected. Run these **in order**:
 | `/nuvyn.implement` | host code | Build the feature |
 | `/nuvyn.converge` | appends `tasks.md` | Remaining work after implement |
 
-Cursor skills are installed as `/nuvyn-constitution` (folder names cannot contain `.`). The command text and Copilot / Claude / Gemini files use `/nuvyn.constitution`.
+Cursor / Copilot / Codex-style skills are installed as `/nuvyn-constitution` (folder names cannot contain `.`). Claude, Gemini, and other command-file agents use `/nuvyn.constitution`.
 
 ## Other commands
 
@@ -141,9 +136,23 @@ Publishing `NuvyntraLabs.Nuvyn.Cli` is pipeline-only on this repository. Order: 
 
 nuget.org uses the Actions secret `NUGET_KEY_NUVYN`. GitHub Packages uses `GITHUB_TOKEN`. Do not run `dotnet nuget push` from a local clone.
 
-## Roadmap — agents not in 0.1.0
+## Coding agents
 
-`nuvyn init` currently installs **Cursor**, **GitHub Copilot**, **Claude Code**, and **Gemini CLI**. Other agents stay deferred (`codex`, `opencode`, `zed`, `generic`, …). Also later: `--vertical`, `nuvyn update`, GitHub issue export.
+`nuvyn init` writes slash commands into the folder each agent already reads (same destinations Spec Kit uses):
+
+| Agent | `--agent` | Files |
+| --- | --- | --- |
+| Cursor | `cursor` (`cursor-agent`) | `.cursor/skills/nuvyn-*/SKILL.md` |
+| GitHub Copilot | `copilot` | `.github/skills/nuvyn-*/SKILL.md` |
+| Claude Code | `claude` | `.claude/commands/nuvyn.*.md` |
+| Gemini CLI | `gemini` | `.gemini/commands/nuvyn.*.toml` |
+| Codex CLI | `codex` | `.agents/skills/nuvyn-*/SKILL.md` |
+| Goose | `goose` | `.goose/recipes/nuvyn.*.yaml` |
+| Generic | `generic` | `.agents/commands/nuvyn.*.md` |
+
+Also: `agy`, `alquimia`, `amp`, `auggie`, `bob`, `cline`, `codebuddy`, `command-code`, `devin`, `docker-agent`, `droid`, `dsh`, `firebender`, `forge`, `grok`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro-cli` (`kiro`), `lingma`, `muse`, `omp`, `opencode`, `pi`, `qodercli`, `qwen`, `roo`, `rovodev`, `shai`, `tabnine`, `trae`, `vibe`, `windsurf`, `zcode`, `zed`.
+
+Roadmap: `--vertical`, `nuvyn update`, GitHub issue export.
 
 ## Alternatives
 

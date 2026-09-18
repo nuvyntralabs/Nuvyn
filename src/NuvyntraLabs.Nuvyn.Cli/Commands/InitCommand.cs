@@ -19,7 +19,7 @@ internal static class InitCommand
         };
         var agentOpt = new Option<string>("--agent", "-a")
         {
-            Description = "AI agent: cursor, copilot, claude, gemini. Prompted when omitted.",
+            Description = "AI coding agent key (cursor, copilot, claude, gemini, codex, windsurf, …). Prompted when omitted.",
         };
         var skipHostOpt = new Option<bool>("--skip-host")
         {
@@ -130,7 +130,7 @@ internal static class InitCommand
 
         if (!string.IsNullOrWhiteSpace(agentId))
         {
-            ConsoleUi.Error($"Unknown agent '{agentId}'. Choose: {string.Join(", ", AiAgent.All.Select(a => a.Id))}.");
+            ConsoleUi.Error($"Unknown agent '{agentId}'. Choose: {string.Join(", ", AiAgent.Ids)}.");
             return null;
         }
 
@@ -140,11 +140,12 @@ internal static class InitCommand
             return AiAgent.Cursor;
         }
 
-        var choice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
+        return AnsiConsole.Prompt(
+            new SelectionPrompt<AiAgent>()
                 .Title("Select your AI coding agent")
-                .AddChoices(AiAgent.All.Select(a => a.DisplayName)));
-
-        return AiAgent.Find(choice) ?? AiAgent.Cursor;
+                .PageSize(15)
+                .EnableSearch()
+                .UseConverter(a => a.PickerLabel)
+                .AddChoices(AiAgent.All));
     }
 }

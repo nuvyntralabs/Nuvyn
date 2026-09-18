@@ -4,7 +4,7 @@ How to create and grow a **.NET MAUI** app on the **Nuvyntra** developer ecosyst
 
 These packages are [Niladri Prasad Padhy](https://github.com/NiladriPadhy) / Nuvyntra Labs work. Nuvyn is its own product, not a Spec Kit clone. Usual alternatives: [GitHub Spec Kit](https://github.com/github/spec-kit) (any stack), stock `dotnet new maui`, CommunityToolkit, Refit, Polly.
 
-**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 0.1.0 · **License:** MIT  
+**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 0.2.0 · **License:** MIT  
 **Site:** https://nuvyntralabs.github.io/toolkits/nuvyn/  
 **Catalog:** https://nuvyntralabs.github.io/llms.txt
 
@@ -18,7 +18,7 @@ These packages are [Niladri Prasad Padhy](https://github.com/NiladriPadhy) / Nuv
 | --- | --- |
 | .NET 10 SDK | The CLI is `net10.0`. Hosts target `net10.0-android` / `ios` / `maccatalyst` / `windows10.0.19041.0` |
 | MAUI workload | So you can build and run the host |
-| An AI coding agent | Cursor, GitHub Copilot, Claude Code, or Gemini CLI |
+| An AI coding agent | Cursor, Copilot, Claude Code, Gemini CLI, Codex, Windsurf, or any other Spec Kit agent |
 | nuget.org access | `init` adds the default Nuvyntra packages at the latest nuget.org versions |
 
 Tizen is not a target. Do not use Nuvyn to start Flutter, React Native, WPF, WinUI, Avalonia, or Uno apps.
@@ -57,9 +57,11 @@ nuvyn init HarborDesk --agent cursor
 nuvyn init HarborDesk --agent copilot
 nuvyn init HarborDesk --agent claude
 nuvyn init HarborDesk --agent gemini
+nuvyn init HarborDesk --agent codex
+nuvyn init HarborDesk --agent windsurf
 ```
 
-Omit `--agent` and the CLI prompts: Cursor, GitHub Copilot, Claude Code, Gemini CLI.
+Omit `--agent` and the CLI shows a searchable picker of Spec Kit coding agents (`cursor (Cursor)`, `agy (Antigravity)`, …). Pass `--agent cursor-agent` if you already use that Spec Kit key.
 
 `init` then:
 
@@ -94,7 +96,7 @@ HarborDesk/
 └── README.md
 ```
 
-Copilot writes `.github/skills/`. Claude writes `.claude/commands/`. Gemini writes `.gemini/commands/`.
+Copilot writes `.github/skills/`. Claude writes `.claude/commands/`. Gemini writes `.gemini/commands/`. Codex / Antigravity write `.agents/skills/`. Other agents use that tool's usual project folder (Goose recipes, Kiro prompts, Windsurf workflows, …).
 
 ### Default host packages
 
@@ -167,7 +169,7 @@ Open the **project folder** in the agent you selected. Run the slash commands **
     → /nuvyn.implement → /nuvyn.converge
 ```
 
-In Cursor and GitHub Copilot the skill folders are named `nuvyn-constitution` (a folder cannot contain `.`). Type `/nuvyn.constitution` in Copilot, Claude, and Gemini.
+In Cursor, Copilot, and other skills-based agents the folders are named `nuvyn-constitution` (a folder cannot contain `.`). Type `/nuvyn.constitution` in Copilot, Claude, Gemini, and command-file agents.
 
 | Step | You do | The agent writes |
 | --- | --- | --- |
@@ -263,7 +265,7 @@ Never `dotnet nuget push` from a local clone. Publishing is pipeline-only (`NUGE
 | Any stack, spec only | GitHub Spec Kit (`specify`) | No MVVMExpress / UIKit host |
 | One plugin | The matching `Plugin.Maui.*` | [Catalog](https://github.com/nuvyntralabs/MauiEssentials) |
 
-Roadmap (not in 0.1.0): more agents (`codex`, `opencode`, `zed`, …), `nuvyn update`, `--vertical`.
+Roadmap: `nuvyn update`, `--vertical`. Coding agents match Spec Kit.
 
 ---
 

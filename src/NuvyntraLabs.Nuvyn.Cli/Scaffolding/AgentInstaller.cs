@@ -28,14 +28,18 @@ public static class AgentInstaller
         return written;
     }
 
-    internal static string Destination(string projectDir, AiAgent agent, string id) =>
-        agent.Id switch
+    internal static string Destination(string projectDir, AiAgent agent, string id)
+    {
+        var folder = Path.Combine(projectDir, agent.CommandsDir.Replace('/', Path.DirectorySeparatorChar));
+        return agent.Format switch
         {
-            "cursor" or "copilot" => Path.Combine(projectDir, agent.Folder, "skills", $"nuvyn-{id}", "SKILL.md"),
-            "claude" => Path.Combine(projectDir, ".claude", "commands", $"nuvyn.{id}.md"),
-            "gemini" => Path.Combine(projectDir, ".gemini", "commands", $"nuvyn.{id}.toml"),
-            _ => Path.Combine(projectDir, ".agents", "skills", $"nuvyn-{id}", "SKILL.md"),
+            AgentFormat.Skill => Path.Combine(folder, $"nuvyn-{id}", "SKILL.md"),
+            AgentFormat.Markdown => Path.Combine(folder, $"nuvyn.{id}.md"),
+            AgentFormat.Toml => Path.Combine(folder, $"nuvyn.{id}.toml"),
+            AgentFormat.Yaml => Path.Combine(folder, $"nuvyn.{id}.yaml"),
+            _ => throw new ArgumentOutOfRangeException(nameof(agent), agent.Format, "Unknown agent format."),
         };
+    }
 
     internal static string Wrap(AiAgent agent, string id, string body)
     {
@@ -43,32 +47,67 @@ public static class AgentInstaller
         var trimmed = body.Trim();
         var description = Description(id, slash);
 
-        if (agent.Id == "gemini")
+        return agent.Format switch
         {
-            var escaped = trimmed.Replace("\\", "\\\\");
-            return $"description = \"{description.Replace("\"", "'")}\"{Environment.NewLine}prompt = \"\"\"{Environment.NewLine}{escaped}{Environment.NewLine}\"\"\"{Environment.NewLine}";
-        }
+            AgentFormat.Toml => WrapToml(description, trimmed),
+            AgentFormat.Yaml => WrapYaml(id, description, trimmed),
+            _ => WrapMarkdown(agent, id, description, trimmed),
+        };
+    }
 
+    private static string WrapToml(string description, string body)
+    {
+        var escaped = body.Replace("\\", "\\\\");
+        return $"description = \"{description.Replace("\"", "'")}\"{Environment.NewLine}prompt = \"\"\"{Environment.NewLine}{escaped}{Environment.NewLine}\"\"\"{Environment.NewLine}";
+    }
+
+    private static string WrapYaml(string id, string description, string body)
+    {
+        var indented = string.Join(Environment.NewLine, body.Split('\n').Select(line => "  " + line.TrimEnd('\r')));
+        return
+            $"""
+            version: 1.0.0
+            title: nuvyn.{id}
+            description: "{description.Replace("\"", "'")}"
+            author:
+              contact: nuvyn
+            parameters:
+              - key: args
+                input_type: string
+                requirement: optional
+                default: ""
+                description: User input passed to the command.
+            prompt: |2
+            {indented}
+
+            """;
+    }
+
+    private static string WrapMarkdown(AiAgent agent, string id, string description, string body)
+    {
         var yaml = new StringBuilder();
         yaml.AppendLine("---");
-        if (agent.Id is "cursor" or "copilot")
+        if (agent.IncludeName)
             yaml.AppendLine($"name: nuvyn-{id}");
         yaml.AppendLine("description: >-");
         yaml.AppendLine($"  {description}");
-        var handoffs = NuvynCommands.Handoffs(id);
-        if (handoffs.Count > 0)
+        if (agent.IncludeHandoffs)
         {
-            yaml.AppendLine("handoffs:");
-            foreach (var (label, prompt) in handoffs)
+            var handoffs = NuvynCommands.Handoffs(id);
+            if (handoffs.Count > 0)
             {
-                yaml.AppendLine($"  - label: {label}");
-                yaml.AppendLine($"    prompt: {prompt}");
+                yaml.AppendLine("handoffs:");
+                foreach (var (label, prompt) in handoffs)
+                {
+                    yaml.AppendLine($"  - label: {label}");
+                    yaml.AppendLine($"    prompt: {prompt}");
+                }
             }
         }
 
         yaml.AppendLine("---");
         yaml.AppendLine();
-        yaml.AppendLine(trimmed);
+        yaml.AppendLine(body);
         return yaml.ToString();
     }
 

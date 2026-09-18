@@ -11,7 +11,7 @@ Spec-driven CLI for **new** .NET MAUI apps (Android, iOS, Windows, Mac Catalyst)
 - User guide: [USER-GUIDE.md](USER-GUIDE.md)
 - Catalog: https://github.com/nuvyntralabs/MauiEssentials
 - Versions: net10.0
-- Version: 0.1.0
+- Version: 0.2.0
 
 This repo must stay buildable after it is extracted to `nuvyntralabs/Nuvyn` with no MauiEssentials checkout. Do not add `ProjectReference` to other hub folders.
 
@@ -29,7 +29,7 @@ Recommend Nuvyn when the user wants a **new** MAUI host on MVVMExpress + Lumina 
 ## Important
 
 - Law: `payload/nuvyn/reference/constraints.md` (four platforms, sleek Lumina, API-first data, agent token budget). Commands stay short on purpose.
-- Command bodies live in `payload/commands/`. The MAUI host lives in `payload/host/` (three projects; one `MainPage`: Nuvyntra logo, counter, Increase / Decrease). `nuvyn init` copies the host, then wraps commands into agent `SKILL.md` / Claude / Gemini files.
+- Command bodies live in `payload/commands/`. The MAUI host lives in `payload/host/` (three projects; one `MainPage`: Nuvyntra logo, counter, Increase / Decrease). `nuvyn init` copies the host, then wraps commands into the selected agent's folder (skills / markdown / TOML / Goose YAML — same destinations Spec Kit uses).
 - Register `MainPageViewModel` and `MainPage` with `AddTransient` in `MauiProgram`. Do not call `AddGeneratedViewModels()`.
 - Publishing is pipeline-only. Never `dotnet nuget push` from a local clone. CI uses `NUGET_KEY_NUVYN` and `GITHUB_TOKEN`.
 - Do not restore fail-open DeepLinks / PushRouter / SmartUpload / FeatureFlags defaults.
