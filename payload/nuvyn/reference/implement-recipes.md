@@ -2,6 +2,8 @@
 
 Read with `.nuvyn/reference/constraints.md`. The host is the three-project tree from `nuvyn init` (`payload/host/MauiApp1`). Do not invent `AppShell`.
 
+If `dotnet build` fails on the machine or csproj (workloads, TFMs, permissions, `UseMaui`), run `maui-dev doctor --path .`. Do not re-run `nuvyn init`.
+
 `[RegisterViewModel]` on a Core type is **not** DI. It does not register the view-model (or the page) in the MAUI host. `AddGeneratedViewModels()` is forbidden.
 
 ## New screen (one checklist)

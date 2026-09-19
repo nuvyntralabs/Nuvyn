@@ -31,6 +31,7 @@ Print a table (ID, Category, Severity, Location, Summary, Recommendation) plus c
 
 - Any CRITICAL → **do not** run `/nuvyn.implement`. Name `/nuvyn.specify` / `/nuvyn.plan` / `/nuvyn.task`.
 - Else → `/nuvyn.implement`.
+- Workload / TFM / `UseMaui` / permission problems are environment findings — recommend `maui-dev doctor --path .`, not a spec rewrite.
 
 ## Done when
 

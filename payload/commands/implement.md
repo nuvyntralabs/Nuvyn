@@ -35,7 +35,8 @@ Scan `checklists/*.md` **except** `requirements.md`. Count `[ ]` vs `[x]`. If an
 5. Halt if a non-parallel task fails.
 6. **Build is the gate.** Creating a file is not enough. Do not mark `[X]` because a path exists.
 7. After **Foundation** (Phase 1), run `dotnet build` on the solution (or MAUI csproj). Halt on failure. Do not start user-story UI until it succeeds.
-8. Do not `dotnet nuget push`.
+8. If the build fails on workloads, TFMs, permissions, `UseMaui`, or signing, run `maui-dev doctor --path .`. Do **not** re-run `nuvyn init`. If `maui-dev` is missing: `dotnet tool install -g Plugin.Maui.MauiDev.Cli --source https://api.nuget.org/v3/index.json`.
+9. Do not `dotnet nuget push`.
 
 ## Completion report
 

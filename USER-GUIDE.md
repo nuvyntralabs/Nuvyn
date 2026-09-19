@@ -4,11 +4,11 @@ How to create and grow a **.NET MAUI** app on the **Nuvyntra** developer ecosyst
 
 These packages are [Niladri Prasad Padhy](https://github.com/NiladriPadhy) / Nuvyntra Labs work. Nuvyn is its own product, not a Spec Kit clone. Usual alternatives: [GitHub Spec Kit](https://github.com/github/spec-kit) (any stack), stock `dotnet new maui`, CommunityToolkit, Refit, Polly.
 
-**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 1.0.0 · **License:** MIT  
+**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 1.1.0 · **License:** MIT  
 **Site:** https://nuvyntralabs.github.io/toolkits/nuvyn/  
 **Catalog:** https://nuvyntralabs.github.io/llms.txt
 
-`nuvyn init <folder_name>` is **only for a new project**. It does **not** overlay an existing repo. It does **not** replace `maui-dev doctor`. Compose: `nuvyn init` then `maui-dev doctor`.
+`nuvyn init <folder_name>` is **only for a new project**. It does **not** overlay an existing repo. It does **not** replace `maui-dev doctor`. `nuvyn init` and `nuvyn check` call `maui-dev doctor` when MauiDev is on PATH (1.2.0+). Missing MauiDev is a warning, not a Nuvyn failure.
 
 ---
 
@@ -42,6 +42,8 @@ nuvyn version
 That is a **global tool**, not an app PackageReference. Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli`. The update refreshes the CLI only; existing apps keep the packages they already have.
 
 Other CLI commands: `nuvyn update`, `nuvyn check`, `nuvyn --help`.
+
+On an interactive terminal `nuvyn`, `maui-dev`, and `maui-perf` ask every 4 hours whether to update from nuget.org (`[y/N]`, default no). Skip with `--no-update-check` or `NUVYNTRA_NO_UPDATE_CHECK=1`. Cache: `~/.nuvyntra/cli-updates.json`. CI / piped output skip automatically. The CLIs do not phone home.
 
 ---
 
@@ -150,7 +152,7 @@ Then run a TFM your machine can deploy (Android emulator, iOS simulator, Mac Cat
 dotnet build HarborDesk/HarborDesk.csproj -f net10.0-android
 ```
 
-Diagnose SDK / workload / project layout with [Plugin.Maui.MauiDev.Cli](https://www.nuget.org/packages/Plugin.Maui.MauiDev.Cli) (Niladri Padhy / MauiEssentials):
+`nuvyn init` / `nuvyn check` already run `maui-dev doctor --path <app>` when [Plugin.Maui.MauiDev.Cli](https://www.nuget.org/packages/Plugin.Maui.MauiDev.Cli) is installed. They do not forward `--no-update-check` (MauiDev 1.2.1 treats that as an unknown option). If doctor exits non-zero, the report is printed under the warning. If `maui-dev` is missing:
 
 ```bash
 dotnet tool install -g Plugin.Maui.MauiDev.Cli --source https://api.nuget.org/v3/index.json
@@ -269,7 +271,9 @@ Never `dotnet nuget push` from a local clone. Publishing is pipeline-only (`NUGE
 | Build: `AddGeneratedViewModels` / `Plugin.Maui.MVVMExpress.Generated` | Remove that call and using. Register the view-model with `AddTransient` |
 | Two `.UseMvvmExpress()` calls | Keep only the configured `UseMvvmExpress(o => …)` chain |
 | Agent added LocalStore / Syncfusion / Refit | You did not ask. Revert. Catalog first, UIKit first |
-| MAUI workload / TFM / permissions errors | `maui-dev doctor` |
+| MAUI workload / TFM / permissions errors | Read the printed `maui-dev doctor` report. Do not re-run `nuvyn init` |
+| `maui-dev doctor exited 1` / Unrecognized `--no-update-check` | Nuvyn no longer forwards that flag. Rebuild or update Nuvyn. Exit 1 can also be a real finding (missing workload) — read the printed report |
+| Update prompt every few hours | Expected. Answer `n` or pass `--no-update-check` / `NUVYNTRA_NO_UPDATE_CHECK=1` on `nuvyn` itself, not on the doctor hand-off |
 
 ---
 
@@ -278,7 +282,7 @@ Never `dotnet nuget push` from a local clone. Publishing is pipeline-only (`NUGE
 | Need | Tool | Notes |
 | --- | --- | --- |
 | New Nuvyntra MAUI host + spec chain | **Nuvyn** (`nuvyn init`, then `nuvyn update`) | This guide |
-| Diagnose an existing MAUI tree | **MauiDev** (`maui-dev doctor`) | [NuGet](https://www.nuget.org/packages/Plugin.Maui.MauiDev.Cli) |
+| Diagnose an existing MAUI tree | **MauiDev** (`maui-dev doctor`) | [NuGet](https://www.nuget.org/packages/Plugin.Maui.MauiDev.Cli). Same 4-hour update prompt as `nuvyn` |
 | Any stack, spec only | GitHub Spec Kit (`specify`) | No MVVMExpress / UIKit host |
 | One plugin | The matching `Plugin.Maui.*` | [Catalog](https://github.com/nuvyntralabs/MauiEssentials) |
 

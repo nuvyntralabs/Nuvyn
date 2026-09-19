@@ -10,7 +10,7 @@ internal static class CheckCommand
     {
         var command = new Command(
             "check",
-            "Check that dotnet, the Nuvyn payload, and (when inside a project) the host stack are available.");
+            "Check that dotnet, the Nuvyn payload, the host stack, and (when installed) maui-dev doctor are available.");
         command.SetAction(_ => Run());
         return command;
     }
@@ -57,6 +57,8 @@ internal static class CheckCommand
             ConsoleUi.Error(error);
             ok = false;
         }
+
+        MauiDevCompanion.Write(MauiDevCompanion.RunDoctor(project));
 
         return ok ? 0 : 1;
     }

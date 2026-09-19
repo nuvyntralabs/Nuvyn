@@ -16,11 +16,11 @@ nuvyn init ClinicApp --agent cursor
 **Catalog:** https://github.com/nuvyntralabs/MauiEssentials  
 **Author:** [Niladri Prasad Padhy](https://github.com/NiladriPadhy)  
 **License:** MIT  
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 Nuvyn is its own product — not a Spec Kit clone or preset. For a generic (any-stack) spec workflow, the usual alternative is [GitHub Spec Kit](https://github.com/github/spec-kit) (`specify init`) plus a hand-picked MAUI stack.
 
-It does **not** replace [MauiDev](https://github.com/nuvyntralabs/MauiDev) (`maui-dev doctor`). Compose them: `nuvyn init` then `maui-dev doctor`.
+It does **not** replace [MauiDev](https://github.com/nuvyntralabs/MauiDev) (`maui-dev doctor`). Compose them: `nuvyn init` / `nuvyn check` call `maui-dev doctor` when that tool is on PATH (maui-dev 1.2.0+). Missing MauiDev is a warning, not a Nuvyn failure.
 
 Nuvyn is a **standalone product**. It must not `ProjectReference` MauiEssentials hub modules. The CLI depends only on `System.CommandLine` and `Spectre.Console`. `nuvyn init` adds Nuvyntra packages to the **user's app** from nuget.org. Publishing is pipeline-only — never `dotnet nuget push` from a local clone.
 
@@ -39,6 +39,8 @@ nuvyn version
 ```
 
 That refreshes the `nuvyn` CLI only. Existing apps keep the packages they already have. Requires the .NET 10 SDK. Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli` into an app.
+
+On an interactive terminal `nuvyn` asks every 4 hours whether to update from nuget.org (`[y/N]`, default no). Skip with `--no-update-check` or `NUVYNTRA_NO_UPDATE_CHECK=1`. The CLI does not phone home.
 
 ## Init
 
@@ -134,11 +136,16 @@ nuvyn version
 nuvyn check
 nuvyn update
 nuvyn --help
+nuvyn --no-update-check version
 ```
 
-`nuvyn check` verifies dotnet and the CLI payload. Inside a Nuvyn app it also proves the host still uses MVVMExpress + UIKit + the smallest `Plugin.Maui.*` set.
+`nuvyn check` verifies dotnet and the CLI payload. Inside a Nuvyn app it also proves the host still uses MVVMExpress + UIKit + the smallest `Plugin.Maui.*` set, then runs `maui-dev doctor` when MauiDev is installed.
+
+On an interactive terminal every 4 hours `nuvyn` asks whether to install the latest nuget.org build (`[y/N]`, default no). Skip with `--no-update-check` or `NUVYNTRA_NO_UPDATE_CHECK=1`. The stamp is shared with `maui-dev` and `maui-perf` in `~/.nuvyntra/cli-updates.json`. The CLI does not phone home.
 
 ## Diagnose the app
+
+`nuvyn init` and `nuvyn check` run `maui-dev doctor --path <app>` when `maui-dev` is on PATH (MauiDev 1.2.0+). They do **not** pass `--no-update-check` — that flag is Nuvyn’s own skip switch, and MauiDev 1.2.1 rejects it. If doctor exits non-zero, Nuvyn prints the report and still exits 0. A missing or old tool is a warning. Install or update with:
 
 ```bash
 dotnet tool install -g Plugin.Maui.MauiDev.Cli --source https://api.nuget.org/v3/index.json

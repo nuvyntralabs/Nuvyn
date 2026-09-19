@@ -134,6 +134,14 @@ internal static class InitCommand
         if (packagesFailed)
             return 1;
 
+        MauiDevCompanionResult? doctor = null;
+        if (host.Created && !skipHost)
+        {
+            ConsoleUi.Step(6, "MauiDev doctor…");
+            doctor = MauiDevCompanion.RunDoctor(projectDir);
+            MauiDevCompanion.Write(doctor);
+        }
+
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold]Next[/]");
         AnsiConsole.MarkupLine($"  cd {ConsoleUi.Escape(projectName)}");
@@ -142,6 +150,8 @@ internal static class InitCommand
         foreach (var slash in NuvynCommands.Slash)
             AnsiConsole.MarkupLine($"    [cyan]{slash}[/]");
         AnsiConsole.MarkupLine("  Later: [cyan]nuvyn update[/] refreshes skills without overlaying host code.");
+        if (doctor?.Status == MauiDevCompanionStatus.Missing)
+            AnsiConsole.MarkupLine("  Diagnose the tree: [cyan]maui-dev doctor[/] after installing Plugin.Maui.MauiDev.Cli.");
 
         return 0;
     }

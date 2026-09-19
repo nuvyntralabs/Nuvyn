@@ -40,7 +40,7 @@ public static class ProjectReadme
             dotnet build
             ```
 
-            Diagnose the tree with `dotnet tool install -g Plugin.Maui.MauiDev.Cli --source https://api.nuget.org/v3/index.json` then `maui-dev doctor`.
+            `nuvyn init` / `nuvyn check` call `maui-dev doctor` when that tool is on PATH. If it is missing: `dotnet tool install -g Plugin.Maui.MauiDev.Cli --source https://api.nuget.org/v3/index.json` then `maui-dev doctor`.
             """;
 
         var path = Path.Combine(projectDir, "README.md");

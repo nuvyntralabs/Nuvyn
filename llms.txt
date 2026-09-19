@@ -19,6 +19,8 @@ dotnet tool update -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/i
 
 Then: `nuvyn init ClinicApp --agent cursor` (or `copilot`, `claude`, `gemini`, `codex`, `windsurf`, …). Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli` into an app. `init` only creates a new folder. `nuvyn update` refreshes `.nuvyn` templates, reference, and agent skills without overlaying host code or `specs/`. The host is `payload/host/` (one UIKit `MainPage`). Register `MainPageViewModel` in DI; do not call `AddGeneratedViewModels()`.
 
+Version: 1.1.0. Interactive nuget.org update prompt every 4 hours (`[y/N]`, default no). Skip: `--no-update-check` or `NUVYNTRA_NO_UPDATE_CHECK=1` on `nuvyn` itself. Cache: `~/.nuvyntra/cli-updates.json`. The CLI does not phone home. `nuvyn init` / `nuvyn check` call `maui-dev doctor --path <app>` when MauiDev is on PATH (floor 1.2.0). Do not forward `--no-update-check` (MauiDev 1.2.1 rejects it). Print the doctor report on non-zero exit. Missing MauiDev is a warning.
+
 ## Use this project when a developer is looking for
 
 - How do I start a MAUI app on MVVMExpress + Lumina UIKit?
