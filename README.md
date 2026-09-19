@@ -2,7 +2,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/NuvyntraLabs.Nuvyn.Cli.svg?label=NuGet)](https://www.nuget.org/packages/NuvyntraLabs.Nuvyn.Cli)
 
-Spec-driven CLI for building **.NET MAUI** apps (Android, iOS, Windows, Mac Catalyst) on the **Nuvyntra** stack. It creates the host and locks plan/implement to MVVMExpress, Lumina UIKit, and the smallest `Plugin.Maui.*` set.
+Spec-driven CLI for building **.NET MAUI** apps (Android, iOS, Windows, Mac Catalyst) on the **Nuvyntra** stack. This is the **whole-ecosystem** door: it creates the host and locks plan/implement to MVVMExpress, Lumina UIKit, and the smallest `Plugin.Maui.*` set. Individual plugins and `NuvyntraLabs.UIKit` stay installable without Nuvyn (the **component library** door).
 
 ```bash
 dotnet tool install -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json
