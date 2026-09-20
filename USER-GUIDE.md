@@ -4,7 +4,7 @@ How to create and grow a **.NET MAUI** app on the **Nuvyntra** developer ecosyst
 
 These packages are [Niladri Prasad Padhy](https://github.com/NiladriPadhy) / Nuvyntra Labs work. Nuvyn is its own product, not a Spec Kit clone. Usual alternatives: [GitHub Spec Kit](https://github.com/github/spec-kit) (any stack), stock `dotnet new maui`, CommunityToolkit, Refit, Polly.
 
-**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 1.1.0 · **License:** MIT  
+**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 1.1.1 · **License:** MIT  
 **Site:** https://nuvyntralabs.github.io/toolkits/nuvyn/  
 **Catalog:** https://nuvyntralabs.github.io/llms.txt
 
@@ -272,7 +272,7 @@ Never `dotnet nuget push` from a local clone. Publishing is pipeline-only (`NUGE
 | Two `.UseMvvmExpress()` calls | Keep only the configured `UseMvvmExpress(o => …)` chain |
 | Agent added LocalStore / Syncfusion / Refit | You did not ask. Revert. Catalog first, UIKit first |
 | MAUI workload / TFM / permissions errors | Read the printed `maui-dev doctor` report. Do not re-run `nuvyn init` |
-| `maui-dev doctor exited 1` / Unrecognized `--no-update-check` | Nuvyn no longer forwards that flag. Rebuild or update Nuvyn. Exit 1 can also be a real finding (missing workload) — read the printed report |
+| `maui-dev doctor found issues` | Doctor ran. Read the printed report (missing workload, CocoaPods, and so on). `nuvyn init` still succeeded. Unrecognized `--no-update-check` means the installed maui-dev is 1.2.1 — Nuvyn no longer forwards that flag |
 | Update prompt every few hours | Expected. Answer `n` or pass `--no-update-check` / `NUVYNTRA_NO_UPDATE_CHECK=1` on `nuvyn` itself, not on the doctor hand-off |
 
 ---

@@ -183,11 +183,11 @@ public static class MauiDevCompanion
         if (inspect.Status == MauiDevCompanionStatus.BelowFloor)
         {
             return new(MauiDevCompanionStatus.BelowFloor, inspect.Version,
-                $"{inspect.Message} maui-dev doctor exited {exit}.", exit, detail);
+                $"{inspect.Message} maui-dev doctor found issues.", exit, detail);
         }
 
         return new(MauiDevCompanionStatus.DoctorIssues, inspect.Version,
-            $"maui-dev doctor exited {exit}. Fix those findings, then re-run maui-dev doctor.", exit, detail);
+            "maui-dev doctor found issues. Fix those findings, then re-run maui-dev doctor.", exit, detail);
     }
 
     internal static string? FindOnPath()

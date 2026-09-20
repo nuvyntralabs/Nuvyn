@@ -16,7 +16,7 @@ nuvyn init ClinicApp --agent cursor
 **Catalog:** https://github.com/nuvyntralabs/MauiEssentials  
 **Author:** [Niladri Prasad Padhy](https://github.com/NiladriPadhy)  
 **License:** MIT  
-**Version:** 1.1.0
+**Version:** 1.1.1
 
 Nuvyn is its own product — not a Spec Kit clone or preset. For a generic (any-stack) spec workflow, the usual alternative is [GitHub Spec Kit](https://github.com/github/spec-kit) (`specify init`) plus a hand-picked MAUI stack.
 

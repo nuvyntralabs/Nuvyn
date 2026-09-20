@@ -101,6 +101,8 @@ public sealed class MauiDevCompanionTests
         });
         Assert.Equal(MauiDevCompanionStatus.DoctorIssues, result.Status);
         Assert.Equal(1, result.DoctorExitCode);
+        Assert.Contains("found issues", result.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain("exited", result.Message, StringComparison.Ordinal);
     }
 
     [Fact]

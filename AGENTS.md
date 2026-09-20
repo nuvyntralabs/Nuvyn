@@ -11,7 +11,7 @@ Spec-driven CLI for **new** .NET MAUI apps (Android, iOS, Windows, Mac Catalyst)
 - User guide: [USER-GUIDE.md](USER-GUIDE.md)
 - Catalog: https://github.com/nuvyntralabs/MauiEssentials
 - Versions: net10.0
-- Version: 1.1.0
+- Version: 1.1.1
 
 This repo must stay buildable after it is extracted to `nuvyntralabs/Nuvyn` with no MauiEssentials checkout. Do not add `ProjectReference` to other hub folders.
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- When `maui-dev doctor` returns findings (exit 1), say it found issues. Do not phrase a successful doctor run as “exited 1”.
+
 ## 1.1.0
 
 - After a successful `nuvyn init` (and on `nuvyn check` inside a project), call `maui-dev doctor` when that tool is on PATH. Missing MauiDev is a warning, not a Nuvyn failure. Floor: maui-dev 1.2.0. Do not pass `--no-update-check` (MauiDev 1.2.1 rejects it). Print doctor output when it exits non-zero.
