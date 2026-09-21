@@ -33,7 +33,7 @@ internal static class UpdateCommand
         var projectDir = ProjectRoot.TryFind(startDirectory);
         if (projectDir is null)
         {
-            ConsoleUi.Error("Not a Nuvyn project. Run nuvyn update from a folder created by nuvyn init.");
+            ConsoleUi.Error("Not a Nuvyn project. Run nuvyn update from a folder created by nuvyn init or nuvyn adopt.");
             return 1;
         }
 
@@ -73,7 +73,7 @@ internal static class UpdateCommand
         InitOptions.Write(projectDir, options);
 
         AnsiConsole.WriteLine();
-        ConsoleUi.Ok("Host code, specs/, and .nuvyn/constitution.md were left untouched.");
+        ConsoleUi.Ok("Host code, specs/, .nuvyn/constitution.md, and .nuvyn/adopt-report.md were left untouched.");
         ConsoleUi.Info("Existing PackageReference versions were not changed.");
         return 0;
     }

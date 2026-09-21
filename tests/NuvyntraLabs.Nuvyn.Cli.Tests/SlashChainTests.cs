@@ -45,6 +45,9 @@ public sealed class SlashChainTests
         }
 
         Assert.Contains("Do not add any other package unless the user explicitly asked", plan);
+        Assert.Contains("adopt-report.md", plan);
+        Assert.Contains("adopt-report.md", implement);
+        Assert.Contains("adopt-report.md", constraints);
         Assert.Contains("Build is the gate", implement);
         Assert.Contains("dotnet build", implement);
         Assert.Contains("maui-dev doctor", implement);

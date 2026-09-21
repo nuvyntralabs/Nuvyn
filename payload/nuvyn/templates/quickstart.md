@@ -1,6 +1,6 @@
 # Quickstart — [FEATURE NAME]
 
-**Host:** `.` (created by `nuvyn init`)
+**Host:** `.` (created by `nuvyn init`, or an existing app attached by `nuvyn adopt`)
 
 Restore and compile first. A file on disk is not a run.
 

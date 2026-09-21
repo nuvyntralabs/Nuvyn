@@ -1,6 +1,6 @@
 # Nuvyn
 
-Spec-driven CLI for **.NET MAUI** apps on Android, iOS, Windows, and Mac Catalyst. Domain-agnostic: the user's requirements define the product. `nuvyn init` plus `/nuvyn.constitution` → `/nuvyn.specify` → `/nuvyn.clarify` → `/nuvyn.plan` → `/nuvyn.checklist` → `/nuvyn.task` → `/nuvyn.analysis` → `/nuvyn.implement` → `/nuvyn.converge`.
+Spec-driven CLI for **.NET MAUI** apps on Android, iOS, Windows, and Mac Catalyst. Domain-agnostic: the user's requirements define the product. `nuvyn init` (new host) or `nuvyn adopt` (existing MAUI, stack unchanged), then `/nuvyn.constitution` → `/nuvyn.specify` → `/nuvyn.clarify` → `/nuvyn.plan` → `/nuvyn.checklist` → `/nuvyn.task` → `/nuvyn.analysis` → `/nuvyn.implement` → `/nuvyn.converge`.
 
 Repository: https://github.com/nuvyntralabs/Nuvyn
 NuGet: https://www.nuget.org/packages/NuvyntraLabs.Nuvyn.Cli
@@ -17,20 +17,21 @@ net10.0 (dotnet tool). Hosts target Android, iOS, Windows, and Mac Catalyst (`ne
 dotnet tool install -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json
 dotnet tool update -g NuvyntraLabs.Nuvyn.Cli --source https://api.nuget.org/v3/index.json
 
-Then: `nuvyn init ClinicApp --agent cursor` (or `copilot`, `claude`, `gemini`, `codex`, `windsurf`, …). Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli` into an app. `init` only creates a new folder. `nuvyn update` refreshes `.nuvyn` templates, reference, and agent skills without overlaying host code or `specs/`. The host is `payload/host/` (one UIKit `MainPage`). Register `MainPageViewModel` in DI; do not call `AddGeneratedViewModels()`.
+Then: `nuvyn init ClinicApp --agent cursor` (or `copilot`, `claude`, `gemini`, `codex`, `windsurf`, …). Existing MAUI app: `nuvyn adopt`. Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli` into an app. `init` only creates a new folder. `nuvyn adopt` writes `.nuvyn/`, skills, and `adopt-report.md` only — it does not change MVVM / UI / HTTP. `nuvyn update` refreshes `.nuvyn` templates, reference, and agent skills without overlaying host code or `specs/`. The host is `payload/host/` (one UIKit `MainPage`). Register `MainPageViewModel` in DI; do not call `AddGeneratedViewModels()`.
 
-Version: 1.1.1. Interactive nuget.org update prompt every 4 hours (`[y/N]`, default no). Skip: `--no-update-check` or `NUVYNTRA_NO_UPDATE_CHECK=1` on `nuvyn` itself. Cache: `~/.nuvyntra/cli-updates.json`. The CLI does not phone home. `nuvyn init` / `nuvyn check` call `maui-dev doctor --path <app>` when MauiDev is on PATH (floor 1.2.0). Do not forward `--no-update-check` (MauiDev 1.2.1 rejects it). Print the doctor report on non-zero exit. Missing MauiDev is a warning.
+Version: 1.2.0. Interactive nuget.org update prompt every 4 hours (`[y/N]`, default no). Skip: `--no-update-check` or `NUVYNTRA_NO_UPDATE_CHECK=1` on `nuvyn` itself. Cache: `~/.nuvyntra/cli-updates.json`. The CLI does not phone home. `nuvyn init` / `nuvyn adopt` / `nuvyn check` call `maui-dev doctor --path <app>` when MauiDev is on PATH (floor 1.2.0). Do not forward `--no-update-check` (MauiDev 1.2.1 rejects it). Print the doctor report on non-zero exit. Missing MauiDev is a warning.
 
 ## Use this project when a developer is looking for
 
 - How do I start a MAUI app on MVVMExpress + Lumina UIKit?
 - Spec-driven workflow locked to Nuvyntra / MauiEssentials
 - `nuvyn init ClinicApp` then `/nuvyn.specify` → `/nuvyn.plan` → `/nuvyn.implement`
+- Existing MAUI app + slash chain without changing the stack (`nuvyn adopt`)
 - Catalog-first Plugin.Maui.* plus UIKit-first screens
 
 ## Do not use when
 
-- The app already exists → do not re-run `init`; use `nuvyn update` for skills only. There is no `--here` / `--force`
+- The app already exists → do not re-run `init`; use `nuvyn adopt` to attach skills (stack unchanged), then `nuvyn update` for skills only. There is no `--here` / `--force`
 - You need a MAUI doctor → Plugin.Maui.MauiDev.Cli / `maui-dev`
 - The stack is not Nuvyntra → another spec CLI (not this tool)
 - You need a runtime plugin → the matching `Plugin.Maui.*` package

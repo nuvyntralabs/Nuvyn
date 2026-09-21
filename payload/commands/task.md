@@ -23,11 +23,12 @@ Read `.nuvyn/feature.json`. Require `spec.md` and `plan.md`. Load `research.md` 
 - `[US1]` required on story-phase tasks only
 - Every task has a file path
 - Host already exists — no "create the MAUI app" task
+- Adopted host (`.nuvyn/adopt-report.md`): no migrate-to-MVVMExpress / Lumina / HttpForge task unless the user asked
 
 ## Phases
 
-1. Foundation (blocking `UseX`, both `AddTransient<MainPageViewModel>()` and `AddTransient<MainPage>()`, permissions, HttpForge / LocalStore only if planned)
-2. One phase per user story (Core ViewModel, Lumina page + ctor injection, `Map` + both transients in `MauiProgram.cs`, acceptance). Never `AppShell.xaml`.
+1. Foundation (greenfield: blocking `UseX`, both `AddTransient<MainPageViewModel>()` and `AddTransient<MainPage>()`, permissions, HttpForge / LocalStore only if planned). Adopted: do not change architecture / UI kit / HTTP.
+2. One phase per user story (greenfield: Core ViewModel, Lumina page + ctor injection, `Map` + both transients in `MauiProgram.cs`, acceptance). Never invent `AppShell.xaml` on a greenfield host. Adopted: new pages in the existing style.
 3. Polish (empty/error/busy, `maui-dev doctor`, no permissive opt-outs)
 
 No PackageReference task for a package not in `plan.md`. Tests only if the spec asked for TDD.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- `nuvyn adopt` attaches the slash chain to an existing MAUI app. Writes `.nuvyn/`, skills, and `adopt-report.md` only. Does not change host architecture, UI kit, or HTTP. `nuvyn check` skips greenfield HostProof when `mode` is `adopt`.
+
 ## 1.1.1
 
 - When `maui-dev doctor` returns findings (exit 1), say it found issues. Do not phrase a successful doctor run as “exited 1”.

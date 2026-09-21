@@ -4,11 +4,11 @@ How to create and grow a **.NET MAUI** app on the **Nuvyntra** developer ecosyst
 
 These packages are [Niladri Prasad Padhy](https://github.com/NiladriPadhy) / Nuvyntra Labs work. Nuvyn is its own product, not a Spec Kit clone. Usual alternatives: [GitHub Spec Kit](https://github.com/github/spec-kit) (any stack), stock `dotnet new maui`, CommunityToolkit, Refit, Polly.
 
-**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 1.1.1 · **License:** MIT  
+**Package:** `NuvyntraLabs.Nuvyn.Cli` · **Version:** 1.2.0 · **License:** MIT  
 **Site:** https://nuvyntralabs.github.io/toolkits/nuvyn/  
 **Catalog:** https://nuvyntralabs.github.io/llms.txt
 
-`nuvyn init <folder_name>` is **only for a new project**. It does **not** overlay an existing repo. It does **not** replace `maui-dev doctor`. `nuvyn init` and `nuvyn check` call `maui-dev doctor` when MauiDev is on PATH (1.2.0+). Missing MauiDev is a warning, not a Nuvyn failure.
+`nuvyn init <folder_name>` is **only for a new project**. It does **not** overlay an existing repo. For an existing MAUI app use `nuvyn adopt`. Neither command replaces `maui-dev doctor`. `nuvyn init`, `nuvyn adopt`, and `nuvyn check` call `maui-dev doctor` when MauiDev is on PATH (1.2.0+). Missing MauiDev is a warning, not a Nuvyn failure.
 
 ---
 
@@ -41,7 +41,7 @@ nuvyn version
 
 That is a **global tool**, not an app PackageReference. Do not `dotnet add package NuvyntraLabs.Nuvyn.Cli`. The update refreshes the CLI only; existing apps keep the packages they already have.
 
-Other CLI commands: `nuvyn update`, `nuvyn check`, `nuvyn --help`.
+Other CLI commands: `nuvyn adopt`, `nuvyn update`, `nuvyn check`, `nuvyn --help`.
 
 On an interactive terminal `nuvyn`, `maui-dev`, and `maui-perf` ask every 4 hours whether to update from nuget.org (`[y/N]`, default no). Skip with `--no-update-check` or `NUVYNTRA_NO_UPDATE_CHECK=1`. Cache: `~/.nuvyntra/cli-updates.json`. CI / piped output skip automatically. The CLIs do not phone home.
 
@@ -51,7 +51,7 @@ On an interactive terminal `nuvyn`, `maui-dev`, and `maui-perf` ask every 4 hour
 
 `nuvyn init <folder_name>` is **only for a new project**. Always a **new folder**. There is no `--here` / `--force`.
 
-If that name already exists as a directory or file, `init` prints an error and exits with code `1`. It does not overlay, merge, or write into the existing tree. Pick another name (or delete a leftover failed scaffold yourself) and run `init` again. For an app that already exists, use `maui-dev doctor` — do not re-run `nuvyn init` on that tree.
+If that name already exists as a directory or file, `init` prints an error and exits with code `1`. It does not overlay, merge, or write into the existing tree. Pick another name (or delete a leftover failed scaffold yourself) and run `init` again. For an app that already exists, use `nuvyn adopt` — do not re-run `nuvyn init` on that tree.
 
 ```bash
 nuvyn init HarborDesk
@@ -77,7 +77,32 @@ If the embedded host is missing, it falls back to `dotnet new mvvmexpress` (then
 
 ---
 
-## 4. What you get
+## 4. Attach an existing MAUI app
+
+`nuvyn adopt` is the existing-app door. It does **not** rewrite the host.
+
+```bash
+cd FieldApp
+nuvyn adopt
+nuvyn adopt --agent cursor
+nuvyn adopt --path ../FieldApp --agent copilot
+```
+
+Adopt:
+
+1. Refuses if the folder is not MAUI (`UseMaui` csproj) or already has `.nuvyn/`
+2. Scans MVVM, chrome, UI kit, and HTTP (read-only)
+3. Writes `.nuvyn/`, agent skills, empty `specs/`, and `.nuvyn/adopt-report.md`
+4. Sets `init-options.json` `"mode": "adopt"`
+5. Runs `maui-dev doctor` when MauiDev is on PATH
+
+It does **not** add MVVMExpress, Lumina UIKit, or HttpForge. It does **not** edit `MauiProgram`, pages, or `HttpClient` call sites. New work keeps that stack. Lumina `NV*` is allowed on **new** screens only if UIKit is already referenced.
+
+Then run the same slash chain as a new app. `/nuvyn.plan` and `/nuvyn.implement` must read `adopt-report.md` first.
+
+---
+
+## 5. What you get
 
 ```
 HarborDesk/
@@ -138,7 +163,7 @@ Do **not** add `AddGeneratedViewModels()`, `using Plugin.Maui.MVVMExpress.Genera
 
 ---
 
-## 5. Run the starter
+## 6. Run the starter
 
 ```bash
 cd HarborDesk
@@ -161,7 +186,7 @@ maui-dev doctor
 
 ---
 
-## 6. Refresh skills on an existing app
+## 7. Refresh skills on an existing app
 
 Do **not** re-run `nuvyn init` on a tree that already exists. After you update the global CLI (`dotnet tool update -g NuvyntraLabs.Nuvyn.Cli`), refresh the app's slash files:
 
@@ -171,13 +196,13 @@ nuvyn update
 nuvyn update --agent cursor
 ```
 
-`update` overwrites `.nuvyn/templates/`, `.nuvyn/reference/`, and the agent command files. It leaves host code, `specs/`, and `.nuvyn/constitution.md` alone. It does not change PackageReference versions. `--vertical` is not in 1.0.
+`update` overwrites `.nuvyn/templates/`, `.nuvyn/reference/`, and the agent command files. It leaves host code, `specs/`, `.nuvyn/constitution.md`, and `.nuvyn/adopt-report.md` alone. It does not change PackageReference versions. `--vertical` is not in 1.0.
 
-`nuvyn check` inside the app also proves the host still uses MVVMExpress + UIKit + HttpForge + FormValidation + KeyboardManager — and nothing else from the catalog.
+`nuvyn check` inside a greenfield app also proves the host still uses MVVMExpress + UIKit + HttpForge + FormValidation + KeyboardManager — and nothing else from the catalog. On an adopted app it prints the inventory and skips that proof.
 
 ---
 
-## 7. Build the product with the agent
+## 8. Build the product with the agent
 
 Open the **project folder** in the agent you selected. Run the slash commands **in order**. Pass extra text after the command when you have a prompt (`$ARGUMENTS`). Empty `/nuvyn.specify` asks you to describe the product.
 
@@ -212,7 +237,7 @@ Domain comes from **your** spec. Nuvyn is not a clinic (or any other vertical) t
 
 ---
 
-## 8. How the ecosystem is used
+## 9. How the ecosystem is used
 
 Standing law after init: `.nuvyn/reference/constraints.md`. Read it once. Do not paste it into the spec.
 
@@ -257,16 +282,20 @@ HttpForge API or in-memory seed until you ask to persist. Then LocalStore — no
 
 If you later add DeepLinks, PushRouter, SmartUpload, or FeatureFlags, keep fail-closed defaults. Do not restore `PermissiveMode`, `AllowUnmappedPayloadRoutes`, or `RequireHttps = false` unless spec **and** plan require it. See [hardened releases](https://github.com/nuvyntralabs/MauiEssentials/blob/main/docs/hardened-releases.md).
 
+AppReview 1.1 is Play Core `ReviewManager` (`GetEligibilityAsync` / `RequestAsync`; `Unavailable` → `OpenStoreListingAsync`). Geofence 1.1 is `GeofencingClient` + persist (`Raise()` is samples only). VideoPipeline 1.1 is `FromCamera()` / `FromGallery()` with thumbnail + OS transcode — not `FromCameraAsync`, not FFmpeg (`CannotTranscode` if the device cannot encode).
+
 Never `dotnet nuget push` from a local clone. Publishing is pipeline-only (`NUGET_KEY_NUVYN` for this CLI).
 
 ---
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 | Symptom | What to do |
 | --- | --- |
-| `ClinicApp already exists` | `init` is new projects only. The existing folder was not changed. Pick another name, or delete a leftover failed scaffold, then retry. To refresh skills, `cd` into the app and run `nuvyn update` |
-| `Not a Nuvyn project` | `update` / `check` host proof need a `.nuvyn/` folder from `nuvyn init` |
+| `ClinicApp already exists` | `init` is new projects only. The existing folder was not changed. Pick another name, or delete a leftover failed scaffold, then retry. For an existing MAUI app, `cd` into it and run `nuvyn adopt`. To refresh skills, run `nuvyn update` |
+| `is already a Nuvyn project` | `adopt` already ran (or `init`). Use `nuvyn update` |
+| `is not a MAUI app` | `adopt` needs a `UseMaui` csproj in that folder |
+| `Not a Nuvyn project` | `update` needs a `.nuvyn/` folder from `nuvyn init` or `nuvyn adopt` |
 | Launch: unable to resolve `MainPageViewModel` | Add `builder.Services.AddTransient<MainPageViewModel>()` |
 | Build: `AddGeneratedViewModels` / `Plugin.Maui.MVVMExpress.Generated` | Remove that call and using. Register the view-model with `AddTransient` |
 | Two `.UseMvvmExpress()` calls | Keep only the configured `UseMvvmExpress(o => …)` chain |
@@ -277,11 +306,12 @@ Never `dotnet nuget push` from a local clone. Publishing is pipeline-only (`NUGE
 
 ---
 
-## 10. Related tools
+## 11. Related tools
 
 | Need | Tool | Notes |
 | --- | --- | --- |
 | New Nuvyntra MAUI host + spec chain | **Nuvyn** (`nuvyn init`, then `nuvyn update`) | This guide |
+| Existing MAUI app + spec chain (keep its stack) | **Nuvyn** (`nuvyn adopt`) | This guide |
 | Diagnose an existing MAUI tree | **MauiDev** (`maui-dev doctor`) | [NuGet](https://www.nuget.org/packages/Plugin.Maui.MauiDev.Cli). Same 4-hour update prompt as `nuvyn` |
 | Any stack, spec only | GitHub Spec Kit (`specify`) | No MVVMExpress / UIKit host |
 | One plugin | The matching `Plugin.Maui.*` | [Catalog](https://github.com/nuvyntralabs/MauiEssentials) |

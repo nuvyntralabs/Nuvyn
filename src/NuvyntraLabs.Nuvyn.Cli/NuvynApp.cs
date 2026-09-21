@@ -25,6 +25,7 @@ public static class NuvynApp
         var root = new RootCommand("Nuvyn — spec-driven .NET MAUI apps on the Nuvyntra stack.")
         {
             InitCommand.Create(),
+            AdoptCommand.Create(),
             UpdateCommand.Create(),
             VersionCommand.Create(),
             CheckCommand.Create(),
@@ -33,7 +34,7 @@ public static class NuvynApp
         root.SetAction(_ =>
         {
             ConsoleUi.Banner();
-            ConsoleUi.Info("Run 'nuvyn --help' for usage. Start with 'nuvyn init <project_name>'.");
+            ConsoleUi.Info("Run 'nuvyn --help' for usage. Start with 'nuvyn init <project_name>' or 'nuvyn adopt'.");
             return 0;
         });
 

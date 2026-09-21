@@ -14,7 +14,7 @@ $ARGUMENTS
 
 1. **Short name** — 2–4 words, action-noun (`user-auth`, `booking-inbox`). Preserve acronyms.
 2. **Feature directory** — next `specs/NNN-short-name` (3-digit, scan existing). Or the `specs/…` path in args. Create it. One feature per run.
-3. Copy `.nuvyn/templates/spec.md` → `spec.md`. Fill Intent, P1/P2 stories (Independent test + Given/when/then), Edge cases, MP table, FR-00n, SC-00n. Leave none as a placeholder. Stay catalog-free (no `Plugin.Maui.*` / `NV*` names). **MP-NAV must name a start route and chrome:** NavigationPage (default) vs tabs vs flyout. Do not leave MP-NAV as “tabs / flyout / deep links” only — plan must not invent Shell.
+3. Copy `.nuvyn/templates/spec.md` → `spec.md`. Fill Intent, P1/P2 stories (Independent test + Given/when/then), Edge cases, MP table, FR-00n, SC-00n. Leave none as a placeholder. Stay catalog-free (no `Plugin.Maui.*` / `NV*` names). **MP-NAV must name a start route and chrome:** NavigationPage (default) vs tabs vs flyout. Do not leave MP-NAV as “tabs / flyout / deep links” only — plan must not invent Shell. If `.nuvyn/adopt-report.md` exists, MP-NAV names the **existing** chrome from that report.
 4. Write `.nuvyn/feature.json`: `{ "feature_directory": "specs/NNN-short-name" }`.
 5. Identify actors, flows, mobile needs (offline, permissions, lock, PII, background, navigation). Testable FRs. User-facing success criteria (no `Plugin.Maui.*` / `NV*` names).
 6. At most **three** `[NEEDS CLARIFICATION]` markers. Guess the rest; record guesses under Assumptions.

@@ -47,15 +47,34 @@ internal static class CheckCommand
         }
 
         ConsoleUi.Ok($"Project: {project}");
-        var proof = HostProof.Inspect(project);
-        foreach (var item in proof.Ok)
-            ConsoleUi.Ok(item);
-        foreach (var warning in proof.Warnings)
-            ConsoleUi.Warn(warning);
-        foreach (var error in proof.Errors)
+        var options = InitOptions.TryRead(project);
+        if (options?.IsAdopt == true)
         {
-            ConsoleUi.Error(error);
-            ok = false;
+            ConsoleUi.Ok("Adopted host — greenfield HostProof skipped");
+            var inventory = AdoptInventory.TryInspect(project);
+            if (inventory is null)
+            {
+                ConsoleUi.Error("No MAUI host csproj (UseMaui) was found.");
+                ok = false;
+            }
+            else
+            {
+                foreach (var line in inventory.Summary)
+                    ConsoleUi.Ok(line);
+            }
+        }
+        else
+        {
+            var proof = HostProof.Inspect(project);
+            foreach (var item in proof.Ok)
+                ConsoleUi.Ok(item);
+            foreach (var warning in proof.Warnings)
+                ConsoleUi.Warn(warning);
+            foreach (var error in proof.Errors)
+            {
+                ConsoleUi.Error(error);
+                ok = false;
+            }
         }
 
         MauiDevCompanion.Write(MauiDevCompanion.RunDoctor(project));

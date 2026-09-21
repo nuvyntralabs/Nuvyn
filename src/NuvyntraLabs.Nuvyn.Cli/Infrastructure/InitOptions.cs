@@ -7,6 +7,8 @@ namespace NuvyntraLabs.Nuvyn.Cli.Infrastructure;
 public sealed class InitOptions
 {
     public const string CliId = "NuvyntraLabs.Nuvyn.Cli";
+    public const string ModeInit = "init";
+    public const string ModeAdopt = "adopt";
 
     private static readonly JsonSerializerOptions Json = new()
     {
@@ -18,8 +20,12 @@ public sealed class InitOptions
 
     public string Agent { get; set; } = "cursor";
     public string Cli { get; set; } = CliId;
+    public string Mode { get; set; } = ModeInit;
     public string? CliVersion { get; set; }
     public string? Updated { get; set; }
+
+    [JsonIgnore]
+    public bool IsAdopt => string.Equals(Mode, ModeAdopt, StringComparison.OrdinalIgnoreCase);
 
     public static string FilePath(string projectDir) =>
         Path.Combine(projectDir, ".nuvyn", "init-options.json");

@@ -10,14 +10,14 @@ You **MUST** consider `$ARGUMENTS` (extra constraints).
 $ARGUMENTS
 ```
 
-Read `.nuvyn/feature.json`. Require `spec.md` and `.nuvyn/constitution.md`. If missing, stop.
+Read `.nuvyn/feature.json`. Require `spec.md` and `.nuvyn/constitution.md`. If missing, stop. If `.nuvyn/adopt-report.md` exists, read it first — that file is the host.
 
 ## Steps
 
 1. Copy `.nuvyn/templates/plan.md` → `plan.md`. Keep the default Package map rows (`UseX` + which csproj). Agents cannot see CLI `DefaultHostPackages`.
-2. **Default host only.** MVVMExpress, UIKit, HttpForge, FormValidation, KeyboardManager. Do not add any other package unless the user explicitly asked.
-3. **NavigationPage.** `UseNavigationPage` + `Map`. Do **not** invent `AppShell` / `.UseShell()`. Tabs = `NVTabView` / `NVBottomNavigation`. Flyout/Shell only if spec MP-NAV named that chrome **and** Complexity tracking records the override. PushRouter routes are Map names — not a reason for Shell.
-4. **UIKit first** — one Lumina recipe per screen. Compose primitives inside the recipe. Do not invent a new `NV*View`.
+2. **Default host only** (greenfield `nuvyn init`). MVVMExpress, UIKit, HttpForge, FormValidation, KeyboardManager. Do not add any other package unless the user explicitly asked. **Adopted host:** copy the Keep column from `adopt-report.md`. Do not plan MVVMExpress, Lumina, or HttpForge unless that report already lists them or the user asked.
+3. **NavigationPage** (greenfield). `UseNavigationPage` + `Map`. Do **not** invent `AppShell` / `.UseShell()`. Tabs = `NVTabView` / `NVBottomNavigation`. Flyout/Shell only if spec MP-NAV named that chrome **and** Complexity tracking records the override. PushRouter routes are Map names — not a reason for Shell. **Adopted host:** keep the chrome in `adopt-report.md`.
+4. **UIKit first** (greenfield) — one Lumina recipe per screen. Compose primitives inside the recipe. Do not invent a new `NV*View`. **Adopted host:** same UI kit as the report. No Lumina unless UIKit is already referenced.
 5. Copy `research.md` / `quickstart.md` templates. Copy `data-model.md` only if the user asked to persist.
 6. HttpForge contracts under `contracts/` if the spec has an API.
 7. Fail-closed rows only for DeepLinks / PushRouter / SmartUpload / FeatureFlags you selected. Permissions from those READMEs only.

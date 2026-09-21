@@ -35,9 +35,13 @@ Keep `/nuvyn.*` cheap:
 - Search with `rg` / targeted reads. Do not slurp the repo.
 - Compose samples live in `ui-and-catalog.md` (form + list + empty/busy). Do not recopy them.
 
+## Adopted host
+
+If `.nuvyn/adopt-report.md` exists, this tree was attached with `nuvyn adopt`. Do **not** apply Default host / NavigationPage / Lumina rules. Keep the architecture, UI kit, and HTTP client in that report. Do not add MVVMExpress, UIKit, or HttpForge unless already present or the user asks. New work matches the Keep column. Do not restyle existing pages.
+
 ## Default host
 
-MVVMExpress, UIKit, HttpForge, FormValidation, KeyboardManager. Nothing else until the user asks.
+MVVMExpress, UIKit, HttpForge, FormValidation, KeyboardManager. Nothing else until the user asks. Skip this section when `.nuvyn/adopt-report.md` exists.
 
 Chrome is **NavigationPage**: `UseNavigationPage` + `.Map<TVm, TPage>("name")` + `AddTransient` for **both** the Core view-model and the page. `[RegisterViewModel]` is not DI. Do not add `AppShell` / `.UseShell()` unless spec MP-NAV named flyout/Shell **and** `plan.md` Complexity tracking records the override. Tabs = `NVTabView` / `NVBottomNavigation` inside a mapped page. PushRouter `Map` uses those route names — it does not require Shell.
 
@@ -60,6 +64,6 @@ Chrome is **NavigationPage**: `UseNavigationPage` + `.Map<TVm, TPage>("name")` +
 
 No `PermissiveMode`, `AllowUnmappedPayloadRoutes`, or `RequireHttps = false` unless spec + plan require it.
 
-Do not invent: Geofence Android `Raise()`, BluetoothSerial = SPP, no FFmpeg, TlsPin needs backup pin, AppReview Android = Play listing, ScreenGuard iOS = overlay, VoipCore ≠ PJSIP.
+Do not invent: Geofence Android is `GeofencingClient` (persist + `Raise()` for samples; `Denied` / `NotSupported` typed results), BluetoothSerial = SPP, VideoPipeline is `FromCamera()` / `FromGallery()` (not `FromCameraAsync`; no FFmpeg; `CannotTranscode` if the device cannot encode; `DefaultMaxDuration` from `UseVideoPipeline`), TlsPin needs backup pin, AppReview is `GetEligibilityAsync` / `RequestAsync` (not `IsEligibleAsync`; Android Play Core `ReviewManager` on Play-installed builds, else `Unavailable` → `OpenStoreListingAsync`), ScreenGuard iOS = overlay, VoipCore ≠ PJSIP.
 
 Never `dotnet nuget push`.

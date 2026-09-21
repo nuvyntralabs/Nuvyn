@@ -41,7 +41,7 @@ If findings exist: scan max task ID `M` and max phase `N`. Append:
 - [ ] T0xx <imperative> per <FR-003|US1/AC2|plan: screen|Constitution|build> (<gap>)
 ```
 
-CRITICAL first. Never reuse IDs. Never edit earlier tasks.
+CRITICAL first. Never reuse IDs. Never edit earlier tasks. Adopted host: do not append a stack migration (MVVMExpress / Lumina / HttpForge) unless the user asked.
 
 If nothing remains: **do not touch** `tasks.md`. Report "✅ Converged".
 

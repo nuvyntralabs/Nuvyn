@@ -75,7 +75,7 @@ internal static class InitCommand
         var projectDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), projectName));
         if (Directory.Exists(projectDir) || File.Exists(projectDir))
         {
-            ConsoleUi.Error($"{projectDir} already exists. nuvyn init only creates a new project. Pick another name.");
+            ConsoleUi.Error($"{projectDir} already exists. nuvyn init only creates a new project. For an existing MAUI app, run nuvyn adopt inside that folder.");
             return 1;
         }
 

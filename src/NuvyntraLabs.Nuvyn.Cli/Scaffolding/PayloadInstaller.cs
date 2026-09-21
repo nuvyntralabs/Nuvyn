@@ -56,7 +56,8 @@ public static class PayloadInstaller
 
         return name.Equals("constitution.md", StringComparison.OrdinalIgnoreCase)
             || name.Equals("feature.json", StringComparison.OrdinalIgnoreCase)
-            || name.Equals("init-options.json", StringComparison.OrdinalIgnoreCase);
+            || name.Equals("init-options.json", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("adopt-report.md", StringComparison.OrdinalIgnoreCase);
     }
 
     public static void CopyDirectory(string source, string dest)

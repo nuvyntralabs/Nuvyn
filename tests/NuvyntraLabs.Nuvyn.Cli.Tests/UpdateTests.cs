@@ -121,6 +121,7 @@ public sealed class UpdateTests
         Assert.True(PayloadInstaller.IsUserOwnedWorkflowFile("constitution.md"));
         Assert.True(PayloadInstaller.IsUserOwnedWorkflowFile("feature.json"));
         Assert.True(PayloadInstaller.IsUserOwnedWorkflowFile("init-options.json"));
+        Assert.True(PayloadInstaller.IsUserOwnedWorkflowFile("adopt-report.md"));
         Assert.False(PayloadInstaller.IsUserOwnedWorkflowFile(Path.Combine("reference", "constraints.md")));
         Assert.False(PayloadInstaller.IsUserOwnedWorkflowFile(Path.Combine("templates", "plan.md")));
     }

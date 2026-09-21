@@ -1,6 +1,6 @@
 # /nuvyn.implement
 
-Execute `tasks.md` in order on the host created by `nuvyn init`. You **MUST** consider `$ARGUMENTS` (`Implement only Foundation`). Empty args → remaining unchecked tasks.
+Execute `tasks.md` in order on the host (`nuvyn init`, or the existing app attached by `nuvyn adopt`). You **MUST** consider `$ARGUMENTS` (`Implement only Foundation`). Empty args → remaining unchecked tasks.
 
 ## User input
 
@@ -28,7 +28,7 @@ Scan `checklists/*.md` **except** `requirements.md`. Count `[ ]` vs `[x]`. If an
 
 ## Rules
 
-1. Read `.nuvyn/reference/constraints.md` and implement-recipes. UIKit first. Catalog first. No invented APIs / `NV*View` / `AppShell`.
+1. Read `.nuvyn/reference/constraints.md` and implement-recipes. If `.nuvyn/adopt-report.md` exists, follow its Keep column: same MVVM, same UI, same HTTP. Do not add MVVMExpress / UIKit / HttpForge or rewrite `HttpClient` unless the user asked. Else UIKit first. Catalog first. No invented APIs / `NV*View` / `AppShell`.
 2. Register every `plan.md` `UseX`. No PackageReference not in the plan.
 3. Fail-closed: no `PermissiveMode`, `AllowUnmappedPayloadRoutes`, or `RequireHttps = false` unless spec + plan both require it.
 4. Sequential tasks in order. `[P]` may run together only on different files.
